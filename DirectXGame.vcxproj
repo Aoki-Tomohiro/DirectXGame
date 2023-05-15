@@ -58,8 +58,8 @@
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\dxcompiler.dll" "C:\School\CG2\2023_DirectXGame3\x64\Debug\dxcompiler.dll"
-copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\dxil.dll" "C:\School\CG2\2023_DirectXGame3\x64\Debug\dxil.dll"</Command>
+      <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
+copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -81,8 +81,8 @@ copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\dxil.dll" "C:\
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\dxcompiler.dll" "C:\School\CG2\2023_DirectXGame3\x64\Debug\dxcompiler.dll"
-copy "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\dxil.dll" "C:\School\CG2\2023_DirectXGame3\x64\Debug\dxil.dll"</Command>
+      <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
+copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
