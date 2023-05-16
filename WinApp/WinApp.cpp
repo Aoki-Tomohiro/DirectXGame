@@ -1,6 +1,6 @@
 #include "WinApp.h"
 
-WinApp::~WinApp(){
+WinApp::~WinApp() {
 	CloseWindow(hwnd_);
 }
 
@@ -58,7 +58,7 @@ std::string WinApp::ConvertString(const std::wstring& str)
 	return result;
 }
 
-void WinApp::CreateGameWindow(const wchar_t* title,int32_t kClientWidth,int32_t kClientHeight) {
+void WinApp::CreateGameWindow(const wchar_t* title, int32_t kClientWidth, int32_t kClientHeight) {
 	//ウィンドウプロシージャ
 	wc_.lpfnWndProc = WindowProc;
 	//ウィンドウクラス名(なんでも良い)
@@ -98,7 +98,7 @@ void WinApp::CreateGameWindow(const wchar_t* title,int32_t kClientWidth,int32_t 
 	ShowWindow(hwnd_, SW_SHOW);
 }
 
-bool WinApp::MessageRoop(){
+bool WinApp::MessageRoop() {
 	//Windowにメッセージが来てたら最優先で処理させる
 	if (PeekMessage(&msg_, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg_);

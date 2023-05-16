@@ -13,35 +13,35 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル\WinApp">
-      <UniqueIdentifier>{d14596bb-1454-465e-a9f1-576dc1990aba}</UniqueIdentifier>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{bc77425d-a1e3-4714-a0ac-6b0bf1c02d31}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\WinApp">
-      <UniqueIdentifier>{46ec6f98-608a-46f7-aac6-1f338e574535}</UniqueIdentifier>
+      <UniqueIdentifier>{f993526c-693a-4ef1-b460-930b42179179}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{7b846ceb-bcf6-472e-8ee4-9c2385e1ae25}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル\WinApp">
+      <UniqueIdentifier>{5233ca5d-eeb2-4b92-ae1e-eef7f6fc9a02}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="WInApp\WinApp.cpp">
+    <ClCompile Include="WinApp\WinApp.cpp">
       <Filter>ソース ファイル\WinApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\2023_DirectXGame3\Object3d.PS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\2023_DirectXGame3\Object3d.VS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="WInApp\WinApp.h">
+    <ClInclude Include="WinApp\WinApp.h">
       <Filter>ヘッダー ファイル\WinApp</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\Object3d.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Object3d.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
