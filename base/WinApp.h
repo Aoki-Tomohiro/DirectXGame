@@ -16,6 +16,7 @@ public:
 	void CreateGameWindow(const wchar_t* title, int32_t kClientWidth, int32_t kClientHeight);
 	bool MessageRoop();
 	HWND GetHwnd() { return hwnd_; };
+
 private:
 	WNDCLASS wc_{};
 	RECT wrc_{};
