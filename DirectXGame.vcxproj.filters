@@ -16,24 +16,42 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{bc77425d-a1e3-4714-a0ac-6b0bf1c02d31}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\WinApp">
-      <UniqueIdentifier>{f993526c-693a-4ef1-b460-930b42179179}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル\base">
+      <UniqueIdentifier>{fe4e0b92-497a-493e-9b33-62776cc243c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\WinApp">
-      <UniqueIdentifier>{5233ca5d-eeb2-4b92-ae1e-eef7f6fc9a02}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\base">
+      <UniqueIdentifier>{4d0a7142-5424-497b-a656-e1784416bf05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\math">
+      <UniqueIdentifier>{ea47ce39-a002-47ad-8a8d-be768a5b7a53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="WinApp\WinApp.cpp">
-      <Filter>ソース ファイル\WinApp</Filter>
+    <ClCompile Include="base\DirectX.cpp">
+      <Filter>ソース ファイル\base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\WinApp.cpp">
+      <Filter>ソース ファイル\base</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipeline.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="WinApp\WinApp.h">
-      <Filter>ヘッダー ファイル\WinApp</Filter>
+    <ClInclude Include="base\DirectX.h">
+      <Filter>ヘッダー ファイル\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\WinApp.h">
+      <Filter>ヘッダー ファイル\base</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipeline.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

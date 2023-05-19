@@ -22,6 +22,7 @@ public:
 	void PostDraw();
 	ID3D12Device* GetDevice() { return device_; };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; };
+	WinApp* GetWinApp() { return winApp_; };
 private:
 	//WinApp
 	WinApp* winApp_ = nullptr;
