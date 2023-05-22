@@ -25,6 +25,12 @@
     <Filter Include="ヘッダー ファイル\math">
       <UniqueIdentifier>{ea47ce39-a002-47ad-8a8d-be768a5b7a53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\model">
+      <UniqueIdentifier>{84b0c85f-7331-4eb4-9c96-f5ca32f8e4b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\model">
+      <UniqueIdentifier>{be2aba5b-3ab2-4a62-930a-b8404f58e272}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -37,7 +43,7 @@
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,11 +53,11 @@
     <ClInclude Include="base\WinApp.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Math.h">
       <Filter>ヘッダー ファイル\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>ヘッダー ファイル\model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

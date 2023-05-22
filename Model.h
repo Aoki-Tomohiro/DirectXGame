@@ -43,4 +43,6 @@ private:
 	D3D12_VIEWPORT viewport_{};
 	//シザー矩形
 	D3D12_RECT scissorRect_{};
+	//
+	ID3D12Resource* materialResource_ = nullptr;
 };

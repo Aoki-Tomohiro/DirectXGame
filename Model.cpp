@@ -1,6 +1,7 @@
 #include "Model.h"
 
 Model::~Model() {
+	materialResource_->Release();
 	graphicsPipelineState_->Release();
 	signatureBlob_->Release();
 	if (errorBlob_) {
@@ -99,6 +100,24 @@ void Model::CreatePipelineStateObject() {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	
+	//RootParameter作成。複数設定できるので配列。今回は結果一つだけなので長さ１の配列
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
+	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号０とバインド
+	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+
+	//マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
+	materialResource_ = CreateBufferResource(directX_->GetDevice(), sizeof(Vector4));
+	//マテリアルにデータを書き込む
+	Vector4* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//今回は赤を書き込んでみる
+	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
 	//シリアライズしてバイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
@@ -229,15 +248,17 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos) {
+void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos) {
 	//VertexBufferの作成
-	Model::CreateVertexData(resource, vertexBufferView, sizeof(Vector4) * 3, pos);
+	Model::CreateVertexData(vertexResource, vertexBufferView, sizeof(Vector4) * 3, pos);
+
 	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
 	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
 	//RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
 	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_);//PSOを設定
 	directX_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後
