@@ -1,7 +1,6 @@
 #include "Model.h"
 
 Model::~Model() {
-	materialResource_->Release();
 	graphicsPipelineState_->Release();
 	signatureBlob_->Release();
 	if (errorBlob_) {
@@ -108,15 +107,6 @@ void Model::CreatePipelineStateObject() {
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号０とバインド
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
-
-	//マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
-	materialResource_ = CreateBufferResource(directX_->GetDevice(), sizeof(Vector4));
-	//マテリアルにデータを書き込む
-	Vector4* materialData = nullptr;
-	//書き込むためのアドレスを取得
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	//今回は赤を書き込んでみる
-	*materialData = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	//シリアライズしてバイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
@@ -230,6 +220,15 @@ void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER
 	vertexData[2] = pos[2];
 }
 
+void Model::CreateMaterialData(ID3D12Resource* materialResource, Vector4* color) {
+	//マテリアルにデータを書き込む
+	Vector4* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//今回は赤を書き込んでみる
+	*materialData = *color;
+}
+
 void Model::CreateViewport() {
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	viewport_.Width = directX_->GetWinApp()->kClientWidth;
@@ -248,9 +247,10 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos) {
+void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos, ID3D12Resource* materialResource, Vector4* color) {
 	//VertexBufferの作成
 	Model::CreateVertexData(vertexResource, vertexBufferView, sizeof(Vector4) * 3, pos);
+	Model::CreateMaterialData(materialResource,color);
 
 	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
 	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
@@ -258,7 +258,7 @@ void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertex
 	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
 	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_);//PSOを設定
 	directX_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後
