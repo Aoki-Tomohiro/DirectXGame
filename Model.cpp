@@ -1,6 +1,6 @@
-#include "Pipeline.h"
+#include "Model.h"
 
-Pipeline::~Pipeline() {
+Model::~Model() {
 	graphicsPipelineState_->Release();
 	signatureBlob_->Release();
 	if (errorBlob_) {
@@ -11,15 +11,15 @@ Pipeline::~Pipeline() {
 	vertexShaderBlob_->Release();
 }
 
-void Pipeline::Initialize(DirectX* directX) {
+void Model::Initialize(DirectX* directX) {
 	directX_ = directX;
-	Pipeline::InitializeDXCCompiler();
-	Pipeline::CreatePipelineStateObject();
-	Pipeline::CreateViewport();
-	Pipeline::CreateScissorRect();
+	Model::InitializeDXCCompiler();
+	Model::CreatePipelineStateObject();
+	Model::CreateViewport();
+	Model::CreateScissorRect();
 }
 
-void Pipeline::InitializeDXCCompiler() {
+void Model::InitializeDXCCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
 	assert(SUCCEEDED(hr));
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
@@ -30,7 +30,7 @@ void Pipeline::InitializeDXCCompiler() {
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* Pipeline::CompileShader(const std::wstring& filePath, const wchar_t* profile,
+IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* profile,
 	IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
 	//1.hlslファイルを読む
 	//これからシェーダーをコンパイルする旨をログに出す
@@ -94,7 +94,7 @@ IDxcBlob* Pipeline::CompileShader(const std::wstring& filePath, const wchar_t* p
 	return shaderBlob;
 }
 
-void Pipeline::CreatePipelineStateObject() {
+void Model::CreatePipelineStateObject() {
 
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -170,7 +170,7 @@ void Pipeline::CreatePipelineStateObject() {
 	assert(SUCCEEDED(hr));
 }
 
-ID3D12Resource* Pipeline::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
 	//頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//UploadHeapを使う
@@ -195,7 +195,7 @@ ID3D12Resource* Pipeline::CreateBufferResource(ID3D12Device* device, size_t size
 	return resource;
 }
 
-void Pipeline::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, size_t sizeInBytes, Vector4* pos) {
+void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, size_t sizeInBytes, Vector4* pos) {
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点三つ分のサイズ
@@ -211,7 +211,7 @@ void Pipeline::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUF
 	vertexData[2] = pos[2];
 }
 
-void Pipeline::CreateViewport() {
+void Model::CreateViewport() {
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	viewport_.Width = directX_->GetWinApp()->kClientWidth;
 	viewport_.Height = directX_->GetWinApp()->kClientHeight;
@@ -221,7 +221,7 @@ void Pipeline::CreateViewport() {
 	viewport_.MaxDepth = 1.0f;
 }
 
-void Pipeline::CreateScissorRect() {
+void Model::CreateScissorRect() {
 	//基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect_.left = 0;
 	scissorRect_.right = directX_->GetWinApp()->kClientWidth;
@@ -229,9 +229,9 @@ void Pipeline::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Pipeline::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos) {
+void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, Vector4* pos) {
 	//VertexBufferの作成
-	Pipeline::CreateVertexData(resource, vertexBufferView, sizeof(Vector4) * 3, pos);
+	Model::CreateVertexData(resource, vertexBufferView, sizeof(Vector4) * 3, pos);
 	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
 	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
 	//RootSignatureを設定。PSOに設定しているけど別途設定が必要

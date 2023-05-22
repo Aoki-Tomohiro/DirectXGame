@@ -4,9 +4,9 @@
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-class Pipeline {
+class Model {
 public:
-	~Pipeline();
+	~Model();
 	void Initialize(DirectX* directX);
 	void InitializeDXCCompiler();
 	IDxcBlob* CompileShader(//CompilerするShaderファイルへのパス

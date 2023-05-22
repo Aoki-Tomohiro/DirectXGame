@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "base/WinApp.h"
 #include "base/DirectX.h"
-#include "Pipeline.h"
+#include "Model.h"
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {
@@ -15,25 +15,25 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	directX->Initialize(winApp);
 
 	//Pipeline
-	Pipeline* pipeline = new Pipeline;
-	pipeline->Initialize(directX);
+	Model* model = new Model;
+	model->Initialize(directX);
 
 	//三角形の作成
 	ID3D12Resource* resource[3] = { nullptr };
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView[3]{};
 	Vector4 pos[3][3] = { 0 };
 
-	resource[0] = pipeline->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
+	resource[0] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
 	pos[0][0] = { -0.8f,-0.8f,0.0f,1.0f };
 	pos[0][1] = { -0.5f,0.0f,0.0f,1.0f };
 	pos[0][2] = { -0.2f,-0.8f,0.0f,1.0f };
 
-	resource[1] = pipeline->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
+	resource[1] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
 	pos[1][0] = { -0.3f,0.0f,0.0f,1.0f };
 	pos[1][1] = { 0.0f,0.8f,0.0f,1.0f };
 	pos[1][2] = { 0.3f,0.0f,0.0f,1.0f };
 
-	resource[2] = pipeline->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
+	resource[2] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
 	pos[2][0] = { 0.2f,-0.8f,0.0f,1.0f };
 	pos[2][1] = { 0.5f,0.0f,0.0f,1.0f };
 	pos[2][2] = { 0.8f,-0.8f,0.0f,1.0f };
@@ -47,9 +47,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 		directX->PreDraw();
 
-		pipeline->Draw(resource[0], vertexBufferView[0], pos[0]);
-		pipeline->Draw(resource[1], vertexBufferView[1], pos[1]);
-		pipeline->Draw(resource[2], vertexBufferView[2], pos[2]);
+		model->Draw(resource[0], vertexBufferView[0], pos[0]);
+		model->Draw(resource[1], vertexBufferView[1], pos[1]);
+		model->Draw(resource[2], vertexBufferView[2], pos[2]);
 
 		directX->PostDraw();
 	}
@@ -57,7 +57,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	resource[0]->Release();
 	resource[1]->Release();
 	resource[2]->Release();
-	delete pipeline;
+	delete model;
 	delete directX;
 	delete winApp;
 
