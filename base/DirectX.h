@@ -17,10 +17,14 @@ public:
 	void CreateSwapChain();
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	void CreateRenderTargetView();
+	void CreateShaderResourceView();
 	void CreateFence();
 	void PreDraw();
 	void PostDraw();
 	ID3D12Device* GetDevice() { return device_; };
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; };
+	D3D12_RENDER_TARGET_VIEW_DESC GetRenderTargetViewDesc() { return rtvDesc_; };
+	ID3D12DescriptorHeap* GetSRVDescriptorHeap() { return srvDescriptorHeap_; };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; };
 	WinApp* GetWinApp() { return winApp_; };
 private:
@@ -41,9 +45,13 @@ private:
 	//コマンドリストを生成
 	ID3D12GraphicsCommandList* commandList_ = nullptr;
 	//スワップチェーン
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	IDXGISwapChain4* swapChain_ = nullptr;
 	//ディスクリプタヒープ
 	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
+	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
+	//RenderTargetView
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	ID3D12Resource* swapChainResources_[2] = { nullptr };
 	//フェンス
 	ID3D12Fence* fence_ = nullptr;

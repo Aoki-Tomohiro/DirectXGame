@@ -2,6 +2,10 @@
 #include "base/WinApp.h"
 #include "base/DirectX.h"
 #include "Model.h"
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_DX12.h>
+
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {
@@ -54,6 +58,18 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		WVPResource[i] = model->CreateBufferResource(directX->GetDevice(), sizeof(Matrix4x4));
 	}
 
+	//ImGuiの初期化
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(winApp->GetHwnd());
+	ImGui_ImplDX12_Init(directX->GetDevice(),
+		directX->GetSwapChainDesc().BufferCount,
+		directX->GetRenderTargetViewDesc().Format,
+		directX->GetSRVDescriptorHeap(),
+		directX->GetSRVDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
+		directX->GetSRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true) {
 		//メインループを抜ける
@@ -61,6 +77,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			break;
 		}
 
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
 		//ゲーム処理
 		transform[0].rotate.y += 0.03f;
 		worldMatrix[0] = MakeAffineMatrix(transform[0].scale, transform[0].rotate, transform[0].translate);
@@ -73,6 +93,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		model->UpdateMatrix(WVPResource[2], worldMatrix[2]);
 
 		//描画始まり
+		ImGui::Render();
 		directX->PreDraw();
 
 		//オブジェクトの描画
@@ -80,11 +101,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		model->Draw(vertexResource[1], vertexBufferView[1], pos[1], materialResource[1], &color[1], WVPResource[1]);
 		model->Draw(vertexResource[2], vertexBufferView[2], pos[2], materialResource[2], &color[2], WVPResource[2]);
 
+		//実際のCommandListのImGuiの描画コマンドを積む
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());
+
 		//描画終わり
 		directX->PostDraw();
 	}
 
 	//解放処理
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 	for (int i = 0; i < 3; i++) {
 		vertexResource[i]->Release();
 		materialResource[i]->Release();
