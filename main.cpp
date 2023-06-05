@@ -9,13 +9,15 @@
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {
+	
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	//WindowsAPI
 	WinApp* winApp = new WinApp;
 	winApp->CreateGameWindow(L"CG2WindowClass", winApp->kClientWidth, winApp->kClientHeight);
 
 	//DirectX
-	DirectX* directX = new DirectX;
+	DirectXCommon* directX = new DirectXCommon;
 	directX->Initialize(winApp);
 
 	//Model
@@ -25,23 +27,32 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	//頂点データ
 	ID3D12Resource* vertexResource[3] = { nullptr };
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView[3]{};
-	Vector4 pos[3][3] = { 0 };
-	vertexResource[0] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
-	pos[0][0] = { -0.8f,-0.8f,0.0f,1.0f };
-	pos[0][1] = { -0.5f,0.0f,0.0f,1.0f };
-	pos[0][2] = { -0.2f,-0.8f,0.0f,1.0f };
-	vertexResource[1] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
-	pos[1][0] = { -0.3f,0.0f,0.0f,1.0f };
-	pos[1][1] = { 0.0f,0.8f,0.0f,1.0f };
-	pos[1][2] = { 0.3f,0.0f,0.0f,1.0f };
-	vertexResource[2] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4) * 3);
-	pos[2][0] = { 0.2f,-0.8f,0.0f,1.0f };
-	pos[2][1] = { 0.5f,0.0f,0.0f,1.0f };
-	pos[2][2] = { 0.8f,-0.8f,0.0f,1.0f };
+	VertexData vertexData[3][3] = { 0 };
+	vertexResource[0] = model->CreateBufferResource(directX->GetDevice(), sizeof(vertexData) * 3);
+	vertexData[0][0].position = { -0.8f,-0.8f,0.0f,1.0f };
+	vertexData[0][0].texcoord = { 0.0f,1.0f };
+	vertexData[0][1].position = { -0.5f,0.0f,0.0f,1.0f };
+	vertexData[0][1].texcoord = { 0.5f,0.0f };
+	vertexData[0][2].position = { -0.2f,-0.8f,0.0f,1.0f };
+	vertexData[0][2].texcoord = { 1.0f,1.0f };
+	vertexResource[1] = model->CreateBufferResource(directX->GetDevice(), sizeof(vertexData) * 3);
+	vertexData[1][0].position = { -0.3f,0.0f,0.0f,1.0f };
+	vertexData[1][0].texcoord = { 0.0f,1.0f };
+	vertexData[1][1].position = { 0.0f,0.8f,0.0f,1.0f };
+	vertexData[1][1].texcoord = { 0.5f,0.0f };
+	vertexData[1][2].position = { 0.3f,0.0f,0.0f,1.0f };
+	vertexData[1][2].texcoord = { 1.0f,1.0f };
+	vertexResource[2] = model->CreateBufferResource(directX->GetDevice(), sizeof(vertexData) * 3);
+	vertexData[2][0].position = { 0.2f,-0.8f,0.0f,1.0f };
+	vertexData[2][0].texcoord = { 0.0f,1.0f };
+	vertexData[2][1].position = { 0.5f,0.0f,0.0f,1.0f };
+	vertexData[2][1].texcoord = { 0.5f,0.0f };
+	vertexData[2][2].position = { 0.8f,-0.8f,0.0f,1.0f };
+	vertexData[2][2].texcoord = { 1.0f,1.0f };
 
 	//マテリアルデータ
 	ID3D12Resource* materialResource[3] = { nullptr };
-	Vector4 color[3] = { {1.0f,0.0f,0.0f,1.0f},{1.0f,0.0f,0.0f,1.0f},{1.0f,0.0f,0.0f,1.0f} };
+	Vector4 color[3] = { {1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f} };
 	materialResource[0] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4));
 	materialResource[1] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4));
 	materialResource[2] = model->CreateBufferResource(directX->GetDevice(), sizeof(Vector4));
@@ -97,9 +108,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		directX->PreDraw();
 
 		//オブジェクトの描画
-		model->Draw(vertexResource[0], vertexBufferView[0], pos[0], materialResource[0], &color[0], WVPResource[0]);
-		model->Draw(vertexResource[1], vertexBufferView[1], pos[1], materialResource[1], &color[1], WVPResource[1]);
-		model->Draw(vertexResource[2], vertexBufferView[2], pos[2], materialResource[2], &color[2], WVPResource[2]);
+		model->Draw(vertexResource[0], vertexBufferView[0], vertexData[0], materialResource[0], &color[0], WVPResource[0]);
+		model->Draw(vertexResource[1], vertexBufferView[1], vertexData[1], materialResource[1], &color[1], WVPResource[1]);
+		model->Draw(vertexResource[2], vertexBufferView[2], vertexData[2], materialResource[2], &color[2], WVPResource[2]);
 
 		//実際のCommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());
@@ -120,6 +131,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	delete model;
 	delete directX;
 	delete winApp;
+
+	CoUninitialize();
 
 	return 0;
 }

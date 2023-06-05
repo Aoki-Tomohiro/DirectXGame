@@ -1,6 +1,11 @@
 #pragma once
 #include <cmath>
 
+struct Vector2 {
+	float x;
+	float y;
+};
+
 struct Vector3 {
 	float x;
 	float y;
@@ -22,6 +27,11 @@ struct Transform {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
+};
+
+struct VertexData {
+	Vector4 position;
+	Vector2 texcoord;
 };
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);

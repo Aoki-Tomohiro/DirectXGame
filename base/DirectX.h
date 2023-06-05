@@ -4,13 +4,14 @@
 #include <dxgi1_6.h>
 #include <cassert>
 #include <dxgidebug.h>
+#include <DirectXTex.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 
-class DirectX {
+class DirectXCommon {
 public:
-	~DirectX();
+	~DirectXCommon();
 	void Initialize(WinApp* winApp);
 	void CreateDXGIDevice();
 	void CreateCommand();
@@ -21,11 +22,20 @@ public:
 	void CreateFence();
 	void PreDraw();
 	void PostDraw();
+	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 	ID3D12Device* GetDevice() { return device_; };
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; };
 	D3D12_RENDER_TARGET_VIEW_DESC GetRenderTargetViewDesc() { return rtvDesc_; };
 	ID3D12DescriptorHeap* GetSRVDescriptorHeap() { return srvDescriptorHeap_; };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; };
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle() {
+		return textureSrvHandleCPU_;
+	};
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle() {
+		return textureSrvHandleGPU_;
+	};
 	WinApp* GetWinApp() { return winApp_; };
 private:
 	//WinApp
@@ -57,4 +67,10 @@ private:
 	ID3D12Fence* fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
 	HANDLE fenceEvent_ = nullptr;
-};
+	//Textureを読んで転送する
+	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	ID3D12Resource* textureResource_ = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
+};	
