@@ -1,5 +1,5 @@
 #pragma once
-#include "base/DirectX.h"
+#include "DirectX.h"
 #include "math/Math.h"
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
