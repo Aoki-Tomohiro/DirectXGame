@@ -19,11 +19,13 @@ public:
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	void CreateRenderTargetView();
 	void CreateShaderResourceView();
+	void CreateDepthStencilView();
 	void CreateFence();
 	void PreDraw();
 	void PostDraw();
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 	ID3D12Device* GetDevice() { return device_; };
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; };
@@ -73,4 +75,8 @@ private:
 	ID3D12Resource* textureResource_ = nullptr;
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
+	//DSV用リソース
+	ID3D12Resource* depthStencilResource_ = nullptr;
+	//DSV用ディスクリプタヒープ
+	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
 };	

@@ -187,6 +187,16 @@ void Model::CreatePipelineStateObject() {
 	assert(pixelShaderBlob_ != nullptr);
 
 
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//Depthの機能を有効化する
+	depthStencilDesc.DepthEnable = true;
+	//書き込みします
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	//比較関数はLessEqual。つまり、近ければ描画される
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_;//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
@@ -196,6 +206,8 @@ void Model::CreatePipelineStateObject() {
 	pixelShaderBlob_->GetBufferSize() };//PixelShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	//書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -235,7 +247,7 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	return resource;
 }
 
-void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, size_t sizeInBytes, VertexData* vertexData) {
+void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData) {
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点三つ分のサイズ
@@ -246,9 +258,9 @@ void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER
 	//書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	//vertexDataに書き込む
-	vertexData_[0] = vertexData[0];
-	vertexData_[1] = vertexData[1];
-	vertexData_[2] = vertexData[2];
+	for (int i = 0; i < sizeof(vertexData); i++) {
+		vertexData_[i] = vertexData[i];
+	}
 }
 
 void Model::CreateMaterialData(ID3D12Resource* materialResource, Vector4* color) {
@@ -271,8 +283,8 @@ void Model::UpdateMatrix(ID3D12Resource* WVPResource, Matrix4x4 matrix) {
 
 void Model::CreateViewport() {
 	//クライアント領域のサイズと一緒にして画面全体に表示
-	viewport_.Width = directX_->GetWinApp()->kClientWidth;
-	viewport_.Height = directX_->GetWinApp()->kClientHeight;
+	viewport_.Width = float(directX_->GetWinApp()->kClientWidth);
+	viewport_.Height = float(directX_->GetWinApp()->kClientHeight);
 	viewport_.TopLeftX = 0;
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
@@ -287,9 +299,9 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource) {
+void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource) {
 	//VertexBufferの作成
-	Model::CreateVertexData(vertexResource, vertexBufferView, sizeof(VertexData) * 3, vertexData);
+	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData);
 	//CBufferの作成
 	Model::CreateMaterialData(materialResource,color);
 
@@ -306,5 +318,5 @@ void Model::Draw(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW vertex
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後
-	directX_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	directX_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
 }
