@@ -247,7 +247,7 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	return resource;
 }
 
-void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData) {
+void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData,uint32_t vertexCount) {
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点三つ分のサイズ
@@ -257,8 +257,7 @@ void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER
 	VertexData* vertexData_ = nullptr;
 	//書き込むためのアドレスを取得
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	//vertexDataに書き込む
-	for (int i = 0; i < sizeof(vertexData); i++) {
+	for (uint32_t i = 0; i < vertexCount; i++) {
 		vertexData_[i] = vertexData[i];
 	}
 }
@@ -301,7 +300,7 @@ void Model::CreateScissorRect() {
 
 void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource) {
 	//VertexBufferの作成
-	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData);
+	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData,vertexCount);
 	//CBufferの作成
 	Model::CreateMaterialData(materialResource,color);
 
