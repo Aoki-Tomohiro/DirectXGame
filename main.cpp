@@ -69,31 +69,31 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			vertexData[start + 1].position.z = std::cos(lat + kLatEvery) * std::sin(lon);
 			vertexData[start + 1].position.w = 1.0f;
 			vertexData[start + 1].texcoord.x = float(lonIndex) / float(kSubdivision); 
-			vertexData[start + 1].texcoord.y = 1.0f - float(latIndex + kLatEvery) / float(kSubdivision);
+			vertexData[start + 1].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
 			vertexData[start + 2].position.x = std::cos(lat) * std::cos(lon + kLonEvery);
 			vertexData[start + 2].position.y = std::sin(lat);
 			vertexData[start + 2].position.z = std::cos(lat) * std::sin(lon + kLonEvery);
 			vertexData[start + 2].position.w = 1.0f;
-			vertexData[start + 2].texcoord.x = float(lonIndex + kLonEvery) / float(kSubdivision);
+			vertexData[start + 2].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
 			vertexData[start + 2].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
 			vertexData[start + 3].position.x = std::cos(lat) * std::cos(lon + kLonEvery);
 			vertexData[start + 3].position.y = std::sin(lat);
 			vertexData[start + 3].position.z = std::cos(lat) * std::sin(lon + kLonEvery);
 			vertexData[start + 3].position.w = 1.0f;
-			vertexData[start + 3].texcoord.x = float(lonIndex + kLonEvery) / float(kSubdivision);
+			vertexData[start + 3].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
 			vertexData[start + 3].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
 			vertexData[start + 4].position.x = std::cos(lat + kLatEvery) * std::cos(lon);
 			vertexData[start + 4].position.y = std::sin(lat + kLatEvery);
 			vertexData[start + 4].position.z = std::cos(lat + kLatEvery) * std::sin(lon);
 			vertexData[start + 4].position.w = 1.0f;
 			vertexData[start + 4].texcoord.x = float(lonIndex) / float(kSubdivision);
-			vertexData[start + 4].texcoord.y = 1.0f - float(latIndex + kLatEvery) / float(kSubdivision);
+			vertexData[start + 4].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
 			vertexData[start + 5].position.x = std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery);
 			vertexData[start + 5].position.y = std::sin(lat + kLatEvery);
 			vertexData[start + 5].position.z = std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery);
 			vertexData[start + 5].position.w = 1.0f;
-			vertexData[start + 5].texcoord.x = float(lonIndex + kLonEvery) / float(kSubdivision);
-			vertexData[start + 5].texcoord.y = 1.0f - float(latIndex + kLatEvery) / float(kSubdivision);
+			vertexData[start + 5].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
+			vertexData[start + 5].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
 		}
 	}
 
@@ -161,7 +161,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		ImGui::ShowDemoWindow();
 		//ゲーム処理
 		//三角形
-		transform.rotate.y += 0.03f;
+		/*transform.rotate.y += 0.03f;*/
 		Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
