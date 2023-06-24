@@ -136,6 +136,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	Transform transformSprite = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
 	transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(Matrix4x4));
 
+	bool useMonsterBall = true;
+
 	//ImGuiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -161,7 +163,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		ImGui::ShowDemoWindow();
 		//ゲーム処理
 		//三角形
-		/*transform.rotate.y += 0.03f;*/
+		transform.rotate.y += 0.03f;
 		Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -176,6 +178,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 		model->UpdateMatrix(transformationMatrixResourceSprite, worldViewProjectionMatrixSprite);
 		ImGui::Begin("Window");
+		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 		ImGui::DragFloat3("spriteTransform", &transformSprite.translate.x, 1.0f);
 		ImGui::DragFloat3("cameraScale", &cameraTransform.scale.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
@@ -187,8 +190,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		directX->PreDraw();
 
 		//オブジェクトの描画
-		model->Draw(vertexResource, vertexBufferView, vertexData, sizeof(vertexData), 1536, materialResource, &color, transformationMatrixData);
-		model->Draw(vertexResourceSprite, vertexBufferViewSprite, vertexDataSprite, sizeof(vertexDataSprite), 6, materialResourceSprite, &spriteColor, transformationMatrixResourceSprite);
+		model->Draw(vertexResource, vertexBufferView, vertexData, sizeof(vertexData), 1536, materialResource, &color, transformationMatrixData, useMonsterBall);
+		model->Draw(vertexResourceSprite, vertexBufferViewSprite, vertexDataSprite, sizeof(vertexDataSprite), 6, materialResourceSprite, &spriteColor, transformationMatrixResourceSprite, false);
 
 		//実際のCommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());

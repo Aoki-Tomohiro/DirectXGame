@@ -298,11 +298,18 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource) {
+void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource, bool useMonsterBall) {
 	//VertexBufferの作成
 	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData,vertexCount);
 	//CBufferの作成
 	Model::CreateMaterialData(materialResource,color);
+
+	//GPUハンドルを取得
+	/*D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = directX_->GetSRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	srvHandle.ptr += directX_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);*/
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandles[2];
+	srvHandles[0] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 1);
+	srvHandles[1] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 2);
 
 	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
 	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
@@ -313,7 +320,7 @@ void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBuffer
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(1, WVPResource->GetGPUVirtualAddress());
 	//SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
-	directX_->GetCommandList()->SetGraphicsRootDescriptorTable(2, directX_->GetSrvGPUHandle());
+	directX_->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? srvHandles[1] : srvHandles[0]);
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後

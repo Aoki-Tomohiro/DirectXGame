@@ -11,6 +11,9 @@
 
 class DirectXCommon {
 public:
+	static uint32_t descriptorSizeSRV;
+	static uint32_t descriptorSizeRTV;
+	static uint32_t descriptorSizeDSV;
 	~DirectXCommon();
 	void Initialize(WinApp* winApp);
 	void CreateDXGIDevice();
@@ -18,7 +21,8 @@ public:
 	void CreateSwapChain();
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	void CreateRenderTargetView();
-	void CreateShaderResourceView();
+	void CreateSRVDescriptorHeap();
+	void CreateShaderResourceView(ID3D12Resource* resource, const DirectX::TexMetadata& metadata, uint32_t index);
 	void CreateDepthStencilView();
 	void CreateFence();
 	void PreDraw();
@@ -32,13 +36,9 @@ public:
 	D3D12_RENDER_TARGET_VIEW_DESC GetRenderTargetViewDesc() { return rtvDesc_; };
 	ID3D12DescriptorHeap* GetSRVDescriptorHeap() { return srvDescriptorHeap_; };
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; };
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCPUHandle() {
-		return textureSrvHandleCPU_;
-	};
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGPUHandle() {
-		return textureSrvHandleGPU_;
-	};
 	WinApp* GetWinApp() { return winApp_; };
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, const uint32_t descriptorSize, uint32_t index);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, const uint32_t descriptorSize, uint32_t index);
 private:
 	//WinApp
 	WinApp* winApp_ = nullptr;
@@ -73,10 +73,11 @@ private:
 	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	ID3D12Resource* textureResource_ = nullptr;
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
-	//DSV用リソース
+	//DSV
 	ID3D12Resource* depthStencilResource_ = nullptr;
-	//DSV用ディスクリプタヒープ
 	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
+	//2枚目のテクスチャを読んで転送する
+	DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	ID3D12Resource* textureResource2_ = nullptr;
 };	

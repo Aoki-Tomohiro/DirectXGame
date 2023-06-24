@@ -24,7 +24,7 @@ public:
 	void UpdateMatrix(ID3D12Resource* WVPResource, Matrix4x4 matrix);
 	void CreateViewport();
 	void CreateScissorRect();
-	void Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource);
+	void Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource, bool useMonsterBall);
 private:
 	//DirectX
 	DirectXCommon* directX_ = nullptr;
