@@ -108,7 +108,7 @@ void Model::CreatePipelineStateObject() {
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
 	
 	//RootParameter作成。複数設定できるので配列。今回は結果一つだけなので長さ１の配列
-	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号０とバインド
@@ -119,6 +119,9 @@ void Model::CreatePipelineStateObject() {
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
 
@@ -149,7 +152,7 @@ void Model::CreatePipelineStateObject() {
 
 
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -158,6 +161,10 @@ void Model::CreatePipelineStateObject() {
 	inputElementDescs[1].SemanticIndex = 0;
 	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[2].SemanticName = "NORMAL";
+	inputElementDescs[2].SemanticIndex = 0;
+	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -262,18 +269,18 @@ void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER
 	}
 }
 
-void Model::CreateMaterialData(ID3D12Resource* materialResource, Vector4* color) {
+void Model::CreateMaterialData(ID3D12Resource* materialResource, Material* color) {
 	//マテリアルにデータを書き込む
-	Vector4* materialData = nullptr;
+	Material* materialData = nullptr;
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	//今回は赤を書き込んでみる
 	*materialData = *color;
 }
 
-void Model::UpdateMatrix(ID3D12Resource* WVPResource, Matrix4x4 matrix) {
+void Model::UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix) {
 	//データを書き込む
-	Matrix4x4* wvpData = nullptr;
+	TransformationMatrix* wvpData = nullptr;
 	//書き込むためのアドレスを取得
 	WVPResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	//単位行列を書き込んでおく
@@ -298,7 +305,7 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Vector4* color, ID3D12Resource* WVPResource, bool useMonsterBall) {
+void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Material* color, ID3D12Resource* WVPResource, bool useMonsterBall, ID3D12Resource* lightingResource) {
 	//VertexBufferの作成
 	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData,vertexCount);
 	//CBufferの作成
@@ -318,6 +325,7 @@ void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBuffer
 	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_);//PSOを設定
 	directX_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightingResource->GetGPUVirtualAddress());
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(1, WVPResource->GetGPUVirtualAddress());
 	//SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
 	directX_->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? srvHandles[1] : srvHandles[0]);

@@ -63,6 +63,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			vertexData[start].position.w = 1.0f;
 			vertexData[start].texcoord.x = float(lonIndex) / float(kSubdivision);
 			vertexData[start].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
+			vertexData[start].normal.x = vertexData[start].position.x;
+			vertexData[start].normal.y = vertexData[start].position.y;
+			vertexData[start].normal.z = vertexData[start].position.z;
 			//残りの５頂点も順番に計算して入力していく
 			vertexData[start + 1].position.x = std::cos(lat + kLatEvery) * std::cos(lon);
 			vertexData[start + 1].position.y = std::sin(lat + kLatEvery);
@@ -70,30 +73,45 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			vertexData[start + 1].position.w = 1.0f;
 			vertexData[start + 1].texcoord.x = float(lonIndex) / float(kSubdivision); 
 			vertexData[start + 1].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
+			vertexData[start + 1].normal.x = vertexData[start + 1].position.x;
+			vertexData[start + 1].normal.y = vertexData[start + 1].position.y;
+			vertexData[start + 1].normal.z = vertexData[start + 1].position.z;
 			vertexData[start + 2].position.x = std::cos(lat) * std::cos(lon + kLonEvery);
 			vertexData[start + 2].position.y = std::sin(lat);
 			vertexData[start + 2].position.z = std::cos(lat) * std::sin(lon + kLonEvery);
 			vertexData[start + 2].position.w = 1.0f;
 			vertexData[start + 2].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
 			vertexData[start + 2].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
+			vertexData[start + 2].normal.x = vertexData[start + 2].position.x;
+			vertexData[start + 2].normal.y = vertexData[start + 2].position.y;
+			vertexData[start + 2].normal.z = vertexData[start + 2].position.z;
 			vertexData[start + 3].position.x = std::cos(lat) * std::cos(lon + kLonEvery);
 			vertexData[start + 3].position.y = std::sin(lat);
 			vertexData[start + 3].position.z = std::cos(lat) * std::sin(lon + kLonEvery);
 			vertexData[start + 3].position.w = 1.0f;
 			vertexData[start + 3].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
 			vertexData[start + 3].texcoord.y = 1.0f - float(latIndex) / float(kSubdivision);
+			vertexData[start + 3].normal.x = vertexData[start + 3].position.x;
+			vertexData[start + 3].normal.y = vertexData[start + 3].position.y;
+			vertexData[start + 3].normal.z = vertexData[start + 3].position.z;
 			vertexData[start + 4].position.x = std::cos(lat + kLatEvery) * std::cos(lon);
 			vertexData[start + 4].position.y = std::sin(lat + kLatEvery);
 			vertexData[start + 4].position.z = std::cos(lat + kLatEvery) * std::sin(lon);
 			vertexData[start + 4].position.w = 1.0f;
 			vertexData[start + 4].texcoord.x = float(lonIndex) / float(kSubdivision);
 			vertexData[start + 4].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
+			vertexData[start + 4].normal.x = vertexData[start + 4].position.x;
+			vertexData[start + 4].normal.y = vertexData[start + 4].position.y;
+			vertexData[start + 4].normal.z = vertexData[start + 4].position.z;
 			vertexData[start + 5].position.x = std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery);
 			vertexData[start + 5].position.y = std::sin(lat + kLatEvery);
 			vertexData[start + 5].position.z = std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery);
 			vertexData[start + 5].position.w = 1.0f;
 			vertexData[start + 5].texcoord.x = float(lonIndex + 1) / float(kSubdivision);
 			vertexData[start + 5].texcoord.y = 1.0f - float(latIndex + 1) / float(kSubdivision);
+			vertexData[start + 5].normal.x = vertexData[start + 5].position.x;
+			vertexData[start + 5].normal.y = vertexData[start + 5].position.y;
+			vertexData[start + 5].normal.z = vertexData[start + 5].position.z;
 		}
 	}
 
@@ -105,36 +123,50 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	//一枚目
 	vertexDataSprite[0].position = { 0.0f,360.0f,0.0f,1.0f };//左下
 	vertexDataSprite[0].texcoord = { 0.0f,1.0f };
+	vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[1].position = { 0.0f,0.0f,0.0f,1.0f };//左上
 	vertexDataSprite[1].texcoord = { 0.0f,0.0f };
+	vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[2].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
+	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
 	//二枚目
 	vertexDataSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };//左上
 	vertexDataSprite[3].texcoord = { 0.0f,0.0f };
+	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[4].position = { 640.0f,0.0f,0.0f,1.0f };//右上
 	vertexDataSprite[4].texcoord = { 1.0f,0.0f };
+	vertexDataSprite[4].normal = { 0.0f,0.0f, -1.0f };
 	vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[5].texcoord = { 1.0f,1.0f };
+	vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
 	vertexResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(vertexDataSprite));
 
 	//マテリアルデータ
 	ID3D12Resource* materialResource = nullptr;
-	Vector4 color = { 1.0f,1.0f,1.0f,1.0f };
+	Material color = { {1.0f,1.0f,1.0f,1.0f},true };
 	materialResource = model->CreateBufferResource(directX->GetDevice(), sizeof(color));
 	ID3D12Resource* materialResourceSprite = nullptr;
-	Vector4 spriteColor = { 1.0f,1.0f,1.0f,1.0f };
+	Material spriteColor = { {1.0f,1.0f,1.0f,1.0f},false };
 	materialResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(spriteColor));
+
+	//Lighting
+	ID3D12Resource* lightingResource = nullptr;
+	DirectionalLight* directionalLight = nullptr;
+	DirectionalLight lightingData = { {1.0f,1.0f,1.0f,1.0f},{0.0f,-1.0f,0.0f},1.0f };
+	lightingResource = model->CreateBufferResource(directX->GetDevice(), sizeof(DirectionalLight));
+	lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
+	*directionalLight = lightingData;
 
 	//WVP用リソース
 	ID3D12Resource* transformationMatrixData = nullptr;
 	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(Matrix4x4));
+	transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
 	
 	ID3D12Resource* transformationMatrixResourceSprite = nullptr;
 	Transform transformSprite = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
-	transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(Matrix4x4));
+	transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
 
 	bool useMonsterBall = true;
 
@@ -160,7 +192,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
 		//ゲーム処理
 		//三角形
 		transform.rotate.y += 0.03f;
@@ -168,21 +199,26 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
-		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		TransformationMatrix worldViewProjectionMatrix = { Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix)),worldMatrix };
 		model->UpdateMatrix(transformationMatrixData, worldViewProjectionMatrix);
+		lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
+		*directionalLight = lightingData;
 
 		//sprite
 		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 		Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(winApp->kClientWidth), float(winApp->kClientHeight), 0.0f, 100.0f);
-		Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+		TransformationMatrix worldViewProjectionMatrixSprite = { Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite)),worldMatrixSprite };
 		model->UpdateMatrix(transformationMatrixResourceSprite, worldViewProjectionMatrixSprite);
+
 		ImGui::Begin("Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.01f);
 		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 		ImGui::DragFloat3("spriteTransform", &transformSprite.translate.x, 1.0f);
 		ImGui::DragFloat3("cameraScale", &cameraTransform.scale.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.01f);
+		ImGui::DragFloat3("lightDirection", &lightingData.direction.x, 0.01f);
 		ImGui::End();
 
 		//描画始まり
@@ -190,8 +226,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		directX->PreDraw();
 
 		//オブジェクトの描画
-		model->Draw(vertexResource, vertexBufferView, vertexData, sizeof(vertexData), 1536, materialResource, &color, transformationMatrixData, useMonsterBall);
-		model->Draw(vertexResourceSprite, vertexBufferViewSprite, vertexDataSprite, sizeof(vertexDataSprite), 6, materialResourceSprite, &spriteColor, transformationMatrixResourceSprite, false);
+		model->Draw(vertexResource, vertexBufferView, vertexData, sizeof(vertexData), 1536, materialResource, &color, transformationMatrixData, useMonsterBall, lightingResource);
+		model->Draw(vertexResourceSprite, vertexBufferViewSprite, vertexDataSprite, sizeof(vertexDataSprite), 6, materialResourceSprite, &spriteColor, transformationMatrixResourceSprite, false, lightingResource);
 
 		//実際のCommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());
@@ -204,6 +240,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+	lightingResource->Release();
 	vertexResourceSprite->Release();
 	materialResourceSprite->Release();
 	transformationMatrixResourceSprite->Release();
