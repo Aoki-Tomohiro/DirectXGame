@@ -4,7 +4,9 @@
 #include <dxgi1_6.h>
 #include <cassert>
 #include <dxgidebug.h>
+#include <vector>
 #include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
@@ -20,6 +22,7 @@ public:
 	void CreateCommand();
 	void CreateSwapChain();
 	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	void CreateRenderTargetView();
 	void CreateSRVDescriptorHeap();
 	void CreateShaderResourceView(ID3D12Resource* resource, const DirectX::TexMetadata& metadata, uint32_t index);
@@ -30,7 +33,7 @@ public:
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
 	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
-	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	ID3D12Device* GetDevice() { return device_; };
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; };
 	D3D12_RENDER_TARGET_VIEW_DESC GetRenderTargetViewDesc() { return rtvDesc_; };
@@ -69,14 +72,16 @@ private:
 	ID3D12Fence* fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
 	HANDLE fenceEvent_ = nullptr;
-	//Textureを読んで転送する
-	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource_ = nullptr;
 	//DSV
 	ID3D12Resource* depthStencilResource_ = nullptr;
 	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
+	//Textureを読んで転送する
+	ID3D12Resource* intermediateResource_ = nullptr;
+	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	ID3D12Resource* textureResource_ = nullptr;
 	//2枚目のテクスチャを読んで転送する
+	ID3D12Resource* intermediateResource2_ = nullptr;
 	DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
 	ID3D12Resource* textureResource2_ = nullptr;
