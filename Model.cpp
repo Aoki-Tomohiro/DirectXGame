@@ -254,7 +254,11 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	return resource;
 }
 
-void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData,uint32_t vertexCount) {
+ID3D12Resource* Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData,uint32_t vertexCount) {
+	ID3D12Resource* vertexResource = nullptr;
+	//vertexBufferViewを作成
+	vertexResource = CreateBufferResource(directX_->GetDevice(), sizeInBytes);
+
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点三つ分のサイズ
@@ -267,15 +271,21 @@ void Model::CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER
 	for (uint32_t i = 0; i < vertexCount; i++) {
 		vertexData_[i] = vertexData[i];
 	}
+	return vertexResource;
 }
 
-void Model::CreateMaterialData(ID3D12Resource* materialResource, Material* color) {
+ID3D12Resource* Model::CreateMaterialData(Material* color) {
+	ID3D12Resource* materialResource = nullptr;
+	materialResource = CreateBufferResource(directX_->GetDevice(), sizeof(Material));
+
 	//マテリアルにデータを書き込む
 	Material* materialData = nullptr;
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 	//今回は赤を書き込んでみる
 	*materialData = *color;
+
+	return materialResource;
 }
 
 void Model::UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix) {
@@ -305,15 +315,8 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Material* color, ID3D12Resource* WVPResource, bool useMonsterBall, ID3D12Resource* lightingResource) {
-	//VertexBufferの作成
-	Model::CreateVertexData(resource, vertexBufferView, sizeInBytes, vertexData,vertexCount);
-	//CBufferの作成
-	Model::CreateMaterialData(materialResource,color);
-
+void Model::Draw(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, uint32_t vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall) {
 	//GPUハンドルを取得
-	/*D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = directX_->GetSRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-	srvHandle.ptr += directX_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);*/
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandles[2];
 	srvHandles[0] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 1);
 	srvHandles[1] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 2);

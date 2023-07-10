@@ -28,19 +28,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	ID3D12Resource* vertexResource = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	VertexData vertexData[1536];
-	vertexData[0].position = { -0.5f,-0.5f,0.0f,1.0f };
-	vertexData[0].texcoord = { 0.0f,1.0f };
-	vertexData[1].position = { 0.0f,0.5f,0.0f,1.0f };
-	vertexData[1].texcoord = { 0.5f,0.0f };
-	vertexData[2].position = { 0.5f,-0.5f,0.0f,1.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
-	vertexData[3].position = { -0.5f,-0.5f,0.5f,1.0f };
-	vertexData[3].texcoord = { 0.0f,1.0f };
-	vertexData[4].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData[4].texcoord = { 0.5f,0.0f };
-	vertexData[5].position = { 0.5f,-0.5f,-0.5f,1.0f };
-	vertexData[5].texcoord = { 1.0f,1.0f };
-	vertexResource = model->CreateBufferResource(directX->GetDevice(), sizeof(VertexData) * 1536);
 	const float pi = 3.14f;
 	const uint32_t kSubdivision = 16;
 	uint32_t latIndex = 0;
@@ -114,13 +101,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			vertexData[start + 5].normal.z = vertexData[start + 5].position.z;
 		}
 	}
-
+	vertexResource = model->CreateVertexResource(vertexBufferView, sizeof(vertexData), vertexData, 1536);
 
 	//Sprite用の頂点リソース
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	VertexData vertexDataSprite[6];
-	//一枚目
 	vertexDataSprite[0].position = { 0.0f,360.0f,0.0f,1.0f };//左下
 	vertexDataSprite[0].texcoord = { 0.0f,1.0f };
 	vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
@@ -130,7 +116,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	vertexDataSprite[2].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
 	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
-	//二枚目
 	vertexDataSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };//左上
 	vertexDataSprite[3].texcoord = { 0.0f,0.0f };
 	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
@@ -140,35 +125,30 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[5].texcoord = { 1.0f,1.0f };
 	vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
-	vertexResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(vertexDataSprite));
+	vertexResourceSprite = model->CreateVertexResource(vertexBufferViewSprite, sizeof(vertexDataSprite), vertexDataSprite, 6);
 
 	//マテリアルデータ
 	ID3D12Resource* materialResource = nullptr;
 	Material color = { {1.0f,1.0f,1.0f,1.0f},true };
-	materialResource = model->CreateBufferResource(directX->GetDevice(), sizeof(color));
+	materialResource = model->CreateMaterialData(&color);
 	ID3D12Resource* materialResourceSprite = nullptr;
 	Material spriteColor = { {1.0f,1.0f,1.0f,1.0f},false };
-	materialResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(spriteColor));
-
-	//Lighting
-	ID3D12Resource* lightingResource = nullptr;
-	DirectionalLight* directionalLight = nullptr;
-	DirectionalLight lightingData = { {1.0f,1.0f,1.0f,1.0f},{0.0f,-1.0f,0.0f},1.0f };
-	lightingResource = model->CreateBufferResource(directX->GetDevice(), sizeof(DirectionalLight));
-	lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
-	*directionalLight = lightingData;
+	materialResourceSprite = model->CreateMaterialData(&spriteColor);
 
 	//WVP用リソース
-	ID3D12Resource* transformationMatrixData = nullptr;
+	ID3D12Resource* transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
 	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
-	
-	ID3D12Resource* transformationMatrixResourceSprite = nullptr;
+	ID3D12Resource* transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
 	Transform transformSprite = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
-	transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
-
 	bool useMonsterBall = true;
+
+	//Lighting
+	ID3D12Resource* lightingResource = model->CreateBufferResource(directX->GetDevice(), sizeof(DirectionalLight));
+	DirectionalLight* directionalLight = nullptr;
+	DirectionalLight lightingData = { {1.0f,1.0f,1.0f,1.0f},{0.0f,-1.0f,0.0f},1.0f };
+	lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
+	*directionalLight = lightingData;
 
 	//ImGuiの初期化
 	IMGUI_CHECKVERSION();
@@ -201,8 +181,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
 		TransformationMatrix worldViewProjectionMatrix = { Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix)),worldMatrix };
 		model->UpdateMatrix(transformationMatrixData, worldViewProjectionMatrix);
-		lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
-		*directionalLight = lightingData;
 
 		//sprite
 		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
@@ -210,6 +188,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(winApp->kClientWidth), float(winApp->kClientHeight), 0.0f, 100.0f);
 		TransformationMatrix worldViewProjectionMatrixSprite = { Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite)),worldMatrixSprite };
 		model->UpdateMatrix(transformationMatrixResourceSprite, worldViewProjectionMatrixSprite);
+
+		//lighting
+		lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
+		*directionalLight = lightingData;
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.01f);
@@ -226,8 +208,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		directX->PreDraw();
 
 		//オブジェクトの描画
-		model->Draw(vertexResource, vertexBufferView, vertexData, sizeof(vertexData), 1536, materialResource, &color, transformationMatrixData, useMonsterBall, lightingResource);
-		model->Draw(vertexResourceSprite, vertexBufferViewSprite, vertexDataSprite, sizeof(vertexDataSprite), 6, materialResourceSprite, &spriteColor, transformationMatrixResourceSprite, false, lightingResource);
+		model->Draw(vertexBufferView, 1536, materialResource, transformationMatrixData, lightingResource, useMonsterBall);
+		model->Draw(vertexBufferViewSprite, 6, materialResourceSprite, transformationMatrixResourceSprite, lightingResource, false);
 
 		//実際のCommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());

@@ -19,12 +19,12 @@ public:
 		IDxcIncludeHandler* includeHandler);
 	void CreatePipelineStateObject();
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
-	void CreateVertexData(ID3D12Resource* vertexResource, D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount);
-	void CreateMaterialData(ID3D12Resource* materialResource, Material* color);
+	ID3D12Resource* CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount);
+	ID3D12Resource* CreateMaterialData(Material* color);
 	void UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix);
 	void CreateViewport();
 	void CreateScissorRect();
-	void Draw(ID3D12Resource* resource, D3D12_VERTEX_BUFFER_VIEW vertexBufferView, VertexData* vertexData, UINT sizeInBytes, uint32_t vertexCount, ID3D12Resource* materialResource, Material* color, ID3D12Resource* WVPResource, bool useMonsterBall, ID3D12Resource* lightingResource);
+	void Draw(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, uint32_t vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall);
 private:
 	//DirectX
 	DirectXCommon* directX_ = nullptr;
