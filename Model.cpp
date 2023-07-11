@@ -106,7 +106,7 @@ void Model::CreatePipelineStateObject() {
 	descriptorRange[0].NumDescriptors = 1;//数は一つ
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
-	
+
 	//RootParameter作成。複数設定できるので配列。今回は結果一つだけなので長さ１の配列
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
@@ -254,7 +254,7 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	return resource;
 }
 
-ID3D12Resource* Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData,uint32_t vertexCount) {
+ID3D12Resource* Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount) {
 	ID3D12Resource* vertexResource = nullptr;
 	//vertexBufferViewを作成
 	vertexResource = CreateBufferResource(directX_->GetDevice(), sizeInBytes);
@@ -315,7 +315,7 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, uint32_t vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall) {
+void Model::Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, uint32_t vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferView) {
 	//GPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandles[2];
 	srvHandles[0] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 1);
@@ -326,7 +326,10 @@ void Model::Draw(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, uint32_t vertexCount
 	//RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
 	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_);//PSOを設定
-	directX_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+	directX_->GetCommandList()->IASetVertexBuffers(0, 1, vertexBufferView);//VBVを設定
+	if (indexBufferView != nullptr) {
+		directX_->GetCommandList()->IASetIndexBuffer(indexBufferView);//IBVを設定
+	}
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightingResource->GetGPUVirtualAddress());
 	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(1, WVPResource->GetGPUVirtualAddress());
@@ -335,5 +338,10 @@ void Model::Draw(D3D12_VERTEX_BUFFER_VIEW vertexBufferView, uint32_t vertexCount
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後
-	directX_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
+	if (indexBufferView != nullptr) {
+		directX_->GetCommandList()->DrawIndexedInstanced(vertexCount, 1, 0, 0, 0);
+	}
+	else {
+		directX_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
+	}
 }
