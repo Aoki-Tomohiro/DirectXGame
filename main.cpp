@@ -169,29 +169,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	indexDataSprite[4] = 3;
 	indexDataSprite[5] = 2;
 
-	//ID3D12Resource* indexResourceSphere = directX->CreateBufferResource(directX->GetDevice(), sizeof(uint32_t) * 1536);
-	//D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
-	////リソースの先頭のアドレスから使う
-	//indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
-	////使用するリソースのサイズはインデックス6つ分のサイズ
-	//indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 1536;
-	////インデックスはuint32_tとする
-	//indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;
-	////インデックスリソースにデータを書き込む
-	//uint32_t* indexDataSphere = nullptr;
-	//indexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
-	//for (uint32_t i = 0; i < kSubdivision; ++i) {
-	//	for (uint32_t j = 0; j < kSubdivision; ++j) {
-	//		uint32_t start = (i * kSubdivision + j) * 6;
-	//		indexDataSphere[start] = start;
-	//		indexDataSphere[start + 1] = start + 1;
-	//		indexDataSphere[start + 2] = start + 2;
-	//		indexDataSphere[start + 3] = start + 2;
-	//		indexDataSphere[start + 4] = start + 1;
-	//		indexDataSphere[start + 5] = start + 3;
-	//	}
-	//}
-
 	//ImGuiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -264,7 +241,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-	/*indexResourceSphere->Release();*/
 	indexResourceSprite->Release();
 	lightingResource->Release();
 	vertexResourceSprite->Release();
