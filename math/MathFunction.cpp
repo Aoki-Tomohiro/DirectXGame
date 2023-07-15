@@ -1,4 +1,4 @@
-#include "Math.h"
+#include "MathFunction.h"
 #include <cassert>
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {

@@ -5,8 +5,8 @@
 #include <cassert>
 #include <dxgidebug.h>
 #include <vector>
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
+#include "DirectXTex.h"
+#include "d3dx12.h"
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")

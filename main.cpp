@@ -2,9 +2,9 @@
 #include "WinApp.h"
 #include "DirectX.h"
 #include "Model.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_win32.h"
-#include "externals/imgui/imgui_impl_DX12.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_DX12.h"
 
 
 //Windowsアプリでのエントリーポイント(main関数)

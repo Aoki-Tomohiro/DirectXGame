@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectX.h"
-#include "math/Math.h"
+#include "MathFunction.h"
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
