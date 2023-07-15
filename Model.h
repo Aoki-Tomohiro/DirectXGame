@@ -21,6 +21,7 @@ public:
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12Resource* CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount);
 	ID3D12Resource* CreateMaterialData(Material* color);
+	void UpdateMaterialData(ID3D12Resource* materialResource, Material* materialData);
 	void UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix);
 	void CreateViewport();
 	void CreateScissorRect();

@@ -288,6 +288,12 @@ ID3D12Resource* Model::CreateMaterialData(Material* color) {
 	return materialResource;
 }
 
+void Model::UpdateMaterialData(ID3D12Resource* materialResource, Material* materialData) {
+	Material* material = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material));
+	*material = *materialData;
+}
+
 void Model::UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix) {
 	//データを書き込む
 	TransformationMatrix* wvpData = nullptr;

@@ -116,24 +116,29 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	vertexDataSprite[2].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
 	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
-	vertexDataSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };//左上
-	vertexDataSprite[3].texcoord = { 0.0f,0.0f };
-	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
-	vertexDataSprite[4].position = { 640.0f,0.0f,0.0f,1.0f };//右上
-	vertexDataSprite[4].texcoord = { 1.0f,0.0f };
-	vertexDataSprite[4].normal = { 0.0f,0.0f, -1.0f };
-	vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };//右下
-	vertexDataSprite[5].texcoord = { 1.0f,1.0f };
-	vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
-	vertexResourceSprite = model->CreateVertexResource(vertexBufferViewSprite, sizeof(vertexDataSprite), vertexDataSprite, 6);
+	vertexDataSprite[3].position = { 640.0f,0.0f,0.0f,1.0f };//右上
+	vertexDataSprite[3].texcoord = { 1.0f,0.0f };
+	vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
+	vertexResourceSprite = model->CreateVertexResource(vertexBufferViewSprite, sizeof(vertexDataSprite), vertexDataSprite, 4);
 
 	//マテリアルデータ
 	ID3D12Resource* materialResource = nullptr;
-	Material color = { {1.0f,1.0f,1.0f,1.0f},true };
-	materialResource = model->CreateMaterialData(&color);
+	Material* materialDataSphere = new Material();
+	materialDataSphere->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDataSphere->enableLighting = true;
+	materialDataSphere->uvTransform = MakeIdentity4x4();
+	materialResource = model->CreateMaterialData(materialDataSphere);
 	ID3D12Resource* materialResourceSprite = nullptr;
-	Material spriteColor = { {1.0f,1.0f,1.0f,1.0f},false };
-	materialResourceSprite = model->CreateMaterialData(&spriteColor);
+	Material* materialDataSprite = new Material();
+	materialDataSprite->color = { 1.0f,1.0f,1.0f,1.0f };
+	materialDataSprite->enableLighting = false;
+	materialDataSprite->uvTransform = MakeIdentity4x4();
+	materialResourceSprite = model->CreateMaterialData(materialDataSprite);
+	Transform uvTransformSprite{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
 
 	//WVP用リソース
 	ID3D12Resource* transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
@@ -166,7 +171,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	indexDataSprite[1] = 1;
 	indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1;
-	indexDataSprite[4] = 4;
+	indexDataSprite[4] = 3;
 	indexDataSprite[5] = 2;
 
 	ID3D12Resource* indexResourceSphere = directX->CreateBufferResource(directX->GetDevice(), sizeof(uint32_t) * 1536);
@@ -235,6 +240,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
 		*directionalLight = lightingData;
 
+		//uvTransform
+		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+		materialDataSprite->uvTransform = uvTransformMatrix;
+		model->UpdateMaterialData(materialResourceSprite, materialDataSprite);
+
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.01f);
 		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
@@ -243,6 +255,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		ImGui::DragFloat3("cameraRotate", &cameraTransform.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraTranslate", &cameraTransform.translate.x, 0.01f);
 		ImGui::DragFloat3("lightDirection", &lightingData.direction.x, 0.01f);
+		ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+		ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+		ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 		ImGui::End();
 
 		//描画始まり
