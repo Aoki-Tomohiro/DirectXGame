@@ -6,23 +6,6 @@ uint32_t DirectXCommon::descriptorSizeDSV;
 
 DirectXCommon::~DirectXCommon() {
 	CloseHandle(fenceEvent_);
-	/*dsvDescriptorHeap_->Release();
-	depthStencilResource_->Release();
-	fence_->Release();
-	srvDescriptorHeap_->Release();
-	rtvDescriptorHeap_->Release();
-	swapChainResources_[0]->Release();
-	swapChainResources_[1]->Release();
-	swapChain_->Release();
-	commandList_->Release();
-	commandAllocator_->Release();
-	commandQueue_->Release();
-	device_->Release();
-	useAdapter_->Release();
-	dxgiFactory_->Release();
-#ifdef _DEBUG
-	debugController_->Release();
-#endif*/
 }
 
 void DirectXCommon::Initialize(WinApp* winApp) {

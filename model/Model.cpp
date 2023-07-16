@@ -256,7 +256,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateBufferResource(const Microso
 Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount) {
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	//vertexBufferViewを作成
-	vertexResource = CreateBufferResource(directX_->GetDevice().Get(), sizeInBytes);
+	vertexResource = CreateBufferResource(directX_->GetDevice(), sizeInBytes);
 
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
@@ -275,7 +275,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateVertexResource(D3D12_VERTEX_
 
 Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateMaterialData(Material* color) {
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
-	materialResource = CreateBufferResource(directX_->GetDevice().Get(), sizeof(Material));
+	materialResource = CreateBufferResource(directX_->GetDevice(), sizeof(Material));
 
 	//マテリアルにデータを書き込む
 	Material* materialData = nullptr;
