@@ -1,7 +1,5 @@
 #pragma once
 #include <cmath>
-#include <vector>
-#include <string>
 
 struct Vector2 {
 	float x;
@@ -57,15 +55,6 @@ struct DirectionalLight {
 	Vector4 color;//ライトの色
 	Vector3 direction;//ライトの向き
 	float intensity;//輝度
-};
-
-struct MaterialData {
-	std::string textureFilePath;
-};
-
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
 };
 
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
