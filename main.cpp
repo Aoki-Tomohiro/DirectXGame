@@ -5,12 +5,15 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_DX12.h"
-
+#include "D3DResourceLeakChecker.h"
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
+
+	//リソースリークチェック
+	D3DResourceLeakChecker leakCheck;
 
 	//WindowsAPI
 	WinApp* winApp = new WinApp;
@@ -27,7 +30,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	//モデル読み込み
 	ModelData modelData = model->LoadObjFile("resource", "plane.obj");
 	//頂点リソースを作る
-	ID3D12Resource* vertexResource = model->CreateBufferResource(directX->GetDevice(), sizeof(VertexData) * modelData.vertices.size());
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = model->CreateBufferResource(directX->GetDevice().Get(), sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う
@@ -40,7 +43,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
 
 	//Sprite用の頂点リソース
-	ID3D12Resource* vertexResourceSprite = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	VertexData vertexDataSprite[4];
 	vertexDataSprite[0].position = { 0.0f,360.0f,0.0f,1.0f };//左下
@@ -58,13 +61,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	vertexResourceSprite = model->CreateVertexResource(vertexBufferViewSprite, sizeof(vertexDataSprite), vertexDataSprite, 4);
 
 	//マテリアルデータ
-	ID3D12Resource* materialResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
 	Material* materialDataSphere = new Material();
 	materialDataSphere->color = { 1.0f,1.0f,1.0f,1.0f };
 	materialDataSphere->enableLighting = true;
 	materialDataSphere->uvTransform = MakeIdentity4x4();
 	materialResource = model->CreateMaterialData(materialDataSphere);
-	ID3D12Resource* materialResourceSprite = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = nullptr;
 	Material* materialDataSprite = new Material();
 	materialDataSprite->color = { 1.0f,1.0f,1.0f,1.0f };
 	materialDataSprite->enableLighting = false;
@@ -77,22 +80,22 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	};
 
 	//WVP用リソース
-	ID3D12Resource* transformationMatrixData = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixData = model->CreateBufferResource(directX->GetDevice().Get(), sizeof(TransformationMatrix));
 	Transform transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	ID3D12Resource* transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice(), sizeof(TransformationMatrix));
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = model->CreateBufferResource(directX->GetDevice().Get(), sizeof(TransformationMatrix));
 	Transform transformSprite = { { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
 	bool useMonsterBall = true;
 
 	//Lighting
-	ID3D12Resource* lightingResource = model->CreateBufferResource(directX->GetDevice(), sizeof(DirectionalLight));
+	Microsoft::WRL::ComPtr<ID3D12Resource> lightingResource = model->CreateBufferResource(directX->GetDevice().Get(), sizeof(DirectionalLight));
 	DirectionalLight* directionalLight = nullptr;
 	DirectionalLight lightingData = { {1.0f,1.0f,1.0f,1.0f},{0.0f,-1.0f,0.0f},1.0f };
 	lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
 	*directionalLight = lightingData;
 
 	//IndexResource
-	ID3D12Resource* indexResourceSprite = directX->CreateBufferResource(directX->GetDevice(), sizeof(uint32_t) * 6);
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = directX->CreateBufferResource(directX->GetDevice(), sizeof(uint32_t) * 6);
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
 	//リソースの先頭のアドレスから使う
 	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
@@ -113,14 +116,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	//Textureを読んで転送する
 	DirectX::ScratchImage mipImages = directX->LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource_ = directX->CreateTextureResource(directX->GetDevice(), metadata);
-	ID3D12Resource* intermediateResource_ = directX->UploadTextureData(textureResource_, mipImages, directX->GetDevice(), directX->GetCommandList());
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = directX->CreateTextureResource(directX->GetDevice(), metadata);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_ = directX->UploadTextureData(textureResource_, mipImages, directX->GetDevice(), directX->GetCommandList());
 	directX->CreateShaderResourceView(textureResource_,metadata, 1);
 	//2枚目のテクスチャを読んで転送する
 	DirectX::ScratchImage mipImages2 = directX->LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	ID3D12Resource* textureResource2_ = directX->CreateTextureResource(directX->GetDevice(), metadata2);
-	ID3D12Resource* intermediateResource2_ = directX->UploadTextureData(textureResource2_, mipImages2, directX->GetDevice(), directX->GetCommandList());
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2_ = directX->CreateTextureResource(directX->GetDevice(), metadata2);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource2_ = directX->UploadTextureData(textureResource2_, mipImages2, directX->GetDevice(), directX->GetCommandList());
 	directX->CreateShaderResourceView(textureResource2_, metadata2, 2);
 
 
@@ -129,10 +132,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(winApp->GetHwnd());
-	ImGui_ImplDX12_Init(directX->GetDevice(),
+	ImGui_ImplDX12_Init(directX->GetDevice().Get(),
 		directX->GetSwapChainDesc().BufferCount,
 		directX->GetRenderTargetViewDesc().Format,
-		directX->GetSRVDescriptorHeap(),
+		directX->GetSRVDescriptorHeap().Get(),
 		directX->GetSRVDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
 		directX->GetSRVDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
@@ -154,14 +157,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
 		TransformationMatrix worldViewProjectionMatrix = { Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix)),worldMatrix };
-		model->UpdateMatrix(transformationMatrixData, worldViewProjectionMatrix);
+		model->UpdateMatrix(transformationMatrixData.Get(), worldViewProjectionMatrix);
 
 		//sprite
 		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
 		Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(winApp->kClientWidth), float(winApp->kClientHeight), 0.0f, 100.0f);
 		TransformationMatrix worldViewProjectionMatrixSprite = { Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite)),worldMatrixSprite };
-		model->UpdateMatrix(transformationMatrixResourceSprite, worldViewProjectionMatrixSprite);
+		model->UpdateMatrix(transformationMatrixResourceSprite.Get(), worldViewProjectionMatrixSprite);
 
 		//lighting
 		lightingResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight));
@@ -172,7 +175,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
 		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
 		materialDataSprite->uvTransform = uvTransformMatrix;
-		model->UpdateMaterialData(materialResourceSprite, materialDataSprite);
+		model->UpdateMaterialData(materialResourceSprite.Get(), materialDataSprite);
 
 		ImGui::Begin("Window");
 		ImGui::DragFloat3("SphereTranslate", &transform.translate.x, 0.01f);
@@ -194,11 +197,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		directX->PreDraw();
 
 		//オブジェクトの描画
-		model->Draw(&vertexBufferView, UINT(modelData.vertices.size()), materialResource, transformationMatrixData, lightingResource, useMonsterBall, nullptr);
+		model->Draw(&vertexBufferView, UINT(modelData.vertices.size()), materialResource.Get(), transformationMatrixData.Get(), lightingResource.Get(), useMonsterBall, nullptr);
 		//model->Draw(&vertexBufferViewSprite, 6, materialResourceSprite, transformationMatrixResourceSprite, lightingResource, false, &indexBufferViewSprite);
 
 		//実際のCommandListのImGuiの描画コマンドを積む
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directX->GetCommandList().Get());
 
 		//描画終わり
 		directX->PostDraw();
@@ -208,18 +211,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-	textureResource2_->Release();
-	intermediateResource2_->Release();
-	textureResource_->Release();
-	intermediateResource_->Release();
-	indexResourceSprite->Release();
-	lightingResource->Release();
-	vertexResourceSprite->Release();
-	materialResourceSprite->Release();
-	transformationMatrixResourceSprite->Release();
-	vertexResource->Release();
-	materialResource->Release();
-	transformationMatrixData->Release();
 	delete model;
 	delete directX;
 	delete winApp;

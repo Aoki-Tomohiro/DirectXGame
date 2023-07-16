@@ -3,12 +3,10 @@
 #include <sstream>
 
 Model::~Model() {
-	graphicsPipelineState_->Release();
 	signatureBlob_->Release();
 	if (errorBlob_) {
 		errorBlob_->Release();
 	}
-	rootSignature_->Release();
 	pixelShaderBlob_->Release();
 	vertexShaderBlob_->Release();
 }
@@ -97,7 +95,6 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 }
 
 void Model::CreatePipelineStateObject() {
-
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -207,7 +204,7 @@ void Model::CreatePipelineStateObject() {
 
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature_;//RootSignature
+	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
 	vertexShaderBlob_->GetBufferSize() };//VertexShader
@@ -231,7 +228,7 @@ void Model::CreatePipelineStateObject() {
 	assert(SUCCEEDED(hr));
 }
 
-ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes) {
 	//頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//UploadHeapを使う
@@ -248,7 +245,7 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	//バッファの場合はこれにする決まり
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	//実際に頂点リソースを作る
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 		IID_PPV_ARGS(&resource));
@@ -256,10 +253,10 @@ ID3D12Resource* Model::CreateBufferResource(ID3D12Device* device, size_t sizeInB
 	return resource;
 }
 
-ID3D12Resource* Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount) {
-	ID3D12Resource* vertexResource = nullptr;
+Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount) {
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	//vertexBufferViewを作成
-	vertexResource = CreateBufferResource(directX_->GetDevice(), sizeInBytes);
+	vertexResource = CreateBufferResource(directX_->GetDevice().Get(), sizeInBytes);
 
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
@@ -276,9 +273,9 @@ ID3D12Resource* Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBuff
 	return vertexResource;
 }
 
-ID3D12Resource* Model::CreateMaterialData(Material* color) {
-	ID3D12Resource* materialResource = nullptr;
-	materialResource = CreateBufferResource(directX_->GetDevice(), sizeof(Material));
+Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateMaterialData(Material* color) {
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
+	materialResource = CreateBufferResource(directX_->GetDevice().Get(), sizeof(Material));
 
 	//マテリアルにデータを書き込む
 	Material* materialData = nullptr;
@@ -290,13 +287,13 @@ ID3D12Resource* Model::CreateMaterialData(Material* color) {
 	return materialResource;
 }
 
-void Model::UpdateMaterialData(ID3D12Resource* materialResource, Material* materialData) {
+void Model::UpdateMaterialData(const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, Material* materialData) {
 	Material* material = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material));
 	*material = *materialData;
 }
 
-void Model::UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix) {
+void Model::UpdateMatrix(const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, TransformationMatrix matrix) {
 	//データを書き込む
 	TransformationMatrix* wvpData = nullptr;
 	//書き込むためのアドレスを取得
@@ -415,7 +412,7 @@ void Model::CreateScissorRect() {
 	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
-void Model::Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferView) {
+void Model::Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferView) {
 	//GPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandles[2];
 	srvHandles[0] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 1);
@@ -424,8 +421,8 @@ void Model::Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, I
 	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
 	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
 	//RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
-	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_);//PSOを設定
+	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());//PSOを設定
 	directX_->GetCommandList()->IASetVertexBuffers(0, 1, vertexBufferView);//VBVを設定
 	if (indexBufferView != nullptr) {
 		directX_->GetCommandList()->IASetIndexBuffer(indexBufferView);//IBVを設定

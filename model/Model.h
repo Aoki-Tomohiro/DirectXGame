@@ -18,16 +18,16 @@ public:
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler);
 	void CreatePipelineStateObject();
-	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
-	ID3D12Resource* CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount);
-	ID3D12Resource* CreateMaterialData(Material* color);
-	void UpdateMaterialData(ID3D12Resource* materialResource, Material* materialData);
-	void UpdateMatrix(ID3D12Resource* WVPResource, TransformationMatrix matrix);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateMaterialData(Material* color);
+	void UpdateMaterialData(const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, Material* materialData);
+	void UpdateMatrix(const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, TransformationMatrix matrix);
 	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	void CreateViewport();
 	void CreateScissorRect();
-	void Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, ID3D12Resource* materialResource, ID3D12Resource* WVPResource, ID3D12Resource* lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferViewSprite);
+	void Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferViewSprite);
 private:
 	//DirectX
 	DirectXCommon* directX_ = nullptr;
@@ -38,12 +38,12 @@ private:
 	//RootSignature
 	ID3DBlob* signatureBlob_ = nullptr;
 	ID3DBlob* errorBlob_ = nullptr;
-	ID3D12RootSignature* rootSignature_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 	//Shaderコンパイル
 	IDxcBlob* vertexShaderBlob_{};
 	IDxcBlob* pixelShaderBlob_{};
 	//PSO
-	ID3D12PipelineState* graphicsPipelineState_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 	//ビューポート
 	D3D12_VIEWPORT viewport_{};
 	//シザー矩形

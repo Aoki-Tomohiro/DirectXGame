@@ -102,6 +102,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="model\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\D3DResourceLeakChecker.h" />
     <ClInclude Include="base\DirectX.h" />
     <ClInclude Include="base\WinApp.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
