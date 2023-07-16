@@ -75,14 +75,4 @@ private:
 	//DSV
 	ID3D12Resource* depthStencilResource_ = nullptr;
 	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
-	//Textureを読んで転送する
-	ID3D12Resource* intermediateResource_ = nullptr;
-	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	ID3D12Resource* textureResource_ = nullptr;
-	//2枚目のテクスチャを読んで転送する
-	ID3D12Resource* intermediateResource2_ = nullptr;
-	DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
-	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	ID3D12Resource* textureResource2_ = nullptr;
 };	

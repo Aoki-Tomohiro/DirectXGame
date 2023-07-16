@@ -6,12 +6,12 @@ uint32_t DirectXCommon::descriptorSizeDSV;
 
 DirectXCommon::~DirectXCommon() {
 	CloseHandle(fenceEvent_);
-	textureResource2_->Release();
-	intermediateResource2_->Release();
+	/*textureResource2_->Release();
+	intermediateResource2_->Release();*/
 	dsvDescriptorHeap_->Release();
 	depthStencilResource_->Release();
-	textureResource_->Release();
-	intermediateResource_->Release();
+	/*textureResource_->Release();
+	intermediateResource_->Release();*/
 	fence_->Release();
 	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
@@ -47,15 +47,15 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 	DirectXCommon::CreateSwapChain();
 	DirectXCommon::CreateRenderTargetView();
 	DirectXCommon::CreateSRVDescriptorHeap();
-	textureResource_ = CreateTextureResource(device_, metadata);
+	/*textureResource_ = CreateTextureResource(device_, metadata);
 	intermediateResource_ = UploadTextureData(textureResource_, mipImages, device_, commandList_);
-	DirectXCommon::CreateShaderResourceView(textureResource_,metadata, 1);
+	DirectXCommon::CreateShaderResourceView(textureResource_,metadata, 1);*/
 	DirectXCommon::CreateFence();
 	depthStencilResource_ = CreateDepthStencilTextureResource(device_, winApp->kClientWidth, winApp->kClientHeight);
 	DirectXCommon::CreateDepthStencilView();
-	textureResource2_ = CreateTextureResource(device_, metadata2);
+	/*textureResource2_ = CreateTextureResource(device_, metadata2);
 	intermediateResource2_ = UploadTextureData(textureResource2_, mipImages2, device_, commandList_);
-	DirectXCommon::CreateShaderResourceView(textureResource2_, metadata2, 2);
+	DirectXCommon::CreateShaderResourceView(textureResource2_, metadata2, 2);*/
 }
 
 void DirectXCommon::CreateDXGIDevice() {
@@ -254,13 +254,8 @@ void DirectXCommon::CreateShaderResourceView(ID3D12Resource* resource, const Dir
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	/*D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_ = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();*/
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_ = DirectXCommon::GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, index);
-	/*D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();*/
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_ = DirectXCommon::GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, index);
-	//先頭はImGuiが使っているのでその次を使う
-	/*textureSrvHandleCPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleGPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);*/
 	//SRVを作成
 	device_->CreateShaderResourceView(resource, &srvDesc, textureSrvHandleCPU_);
 }
