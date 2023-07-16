@@ -106,7 +106,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	//Sprite用の頂点リソース
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-	VertexData vertexDataSprite[6];
+	VertexData vertexDataSprite[4];
 	vertexDataSprite[0].position = { 0.0f,360.0f,0.0f,1.0f };//左下
 	vertexDataSprite[0].texcoord = { 0.0f,1.0f };
 	vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
@@ -116,15 +116,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	vertexDataSprite[2].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
 	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
-	//vertexDataSprite[3].position = { 0.0f,0.0f,0.0f,1.0f };//左上
-	//vertexDataSprite[3].texcoord = { 0.0f,0.0f };
-	//vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
 	vertexDataSprite[3].position = { 640.0f,0.0f,0.0f,1.0f };//右上
 	vertexDataSprite[3].texcoord = { 1.0f,0.0f };
 	vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
-	//vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };//右下
-	//vertexDataSprite[5].texcoord = { 1.0f,1.0f };
-	//vertexDataSprite[5].normal = { 0.0f,0.0f,-1.0f };
 	vertexResourceSprite = model->CreateVertexResource(vertexBufferViewSprite, sizeof(vertexDataSprite), vertexDataSprite, 4);
 
 	//マテリアルデータ
