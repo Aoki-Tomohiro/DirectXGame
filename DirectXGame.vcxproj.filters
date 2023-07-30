@@ -13,35 +13,56 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{bc77425d-a1e3-4714-a0ac-6b0bf1c02d31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\base">
-      <UniqueIdentifier>{fe4e0b92-497a-493e-9b33-62776cc243c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\base">
-      <UniqueIdentifier>{4d0a7142-5424-497b-a656-e1784416bf05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\math">
-      <UniqueIdentifier>{ea47ce39-a002-47ad-8a8d-be768a5b7a53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\model">
-      <UniqueIdentifier>{84b0c85f-7331-4eb4-9c96-f5ca32f8e4b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\model">
-      <UniqueIdentifier>{be2aba5b-3ab2-4a62-930a-b8404f58e272}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\math">
-      <UniqueIdentifier>{d387066e-5d0e-4f10-8b73-7a4b0443d54b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="imgui">
       <UniqueIdentifier>{f4d00dc3-dcdb-47ea-b064-e77a583f6e32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{bc77425d-a1e3-4714-a0ac-6b0bf1c02d31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\scene">
+      <UniqueIdentifier>{2a072231-4c41-4a95-a905-e08debcf06ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\scene">
+      <UniqueIdentifier>{58747450-92fa-46cb-bc24-e4c9f029d5d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base">
+      <UniqueIdentifier>{80597dea-fe8b-4078-a664-8ac2f66a869a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\base">
+      <UniqueIdentifier>{e6ecdef6-c0f4-4bc5-a3d9-3191e148cd23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\math">
+      <UniqueIdentifier>{29e293d0-d031-49b9-8f25-1e42ab7d098a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\math">
+      <UniqueIdentifier>{926acf43-fd03-4afe-8052-6ef4bfa484c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\model">
+      <UniqueIdentifier>{84e66521-46ad-45bc-88cb-85fbe071f1db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\model">
+      <UniqueIdentifier>{88b7b4a3-c7df-4814-b3d3-11b53a1de39f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\transformationmatrix">
+      <UniqueIdentifier>{fc0d8f62-4bf9-4ec7-9ab7-a8d75b3930ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\transformationmatrix">
+      <UniqueIdentifier>{fe6b92f9-0f65-40e0-9986-3848df4f572b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\imguimanager">
+      <UniqueIdentifier>{d6db5bdc-b1f9-45bc-ac96-b07d46ab7c65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\imguimanager">
+      <UniqueIdentifier>{27eab671-8044-4205-8366-e574e1460a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\texture">
+      <UniqueIdentifier>{02932910-1192-4ecd-9348-b61176c0f576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\texture">
+      <UniqueIdentifier>{7ef1c402-15e3-4eb5-bf4b-fded32067223}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -63,17 +84,47 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="base\DirectX.cpp">
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\GameScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\TitleScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="base\DirectXCommon.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="base\WinApp.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
+    <ClCompile Include="math\MathFunction.cpp">
+      <Filter>ソース ファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\GameManager.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="model\DirectionalLight.cpp">
+      <Filter>ソース ファイル\model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Material.cpp">
+      <Filter>ソース ファイル\model</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Mesh.cpp">
+      <Filter>ソース ファイル\model</Filter>
+    </ClCompile>
     <ClCompile Include="model\Model.cpp">
       <Filter>ソース ファイル\model</Filter>
     </ClCompile>
-    <ClCompile Include="math\MathFunction.cpp">
-      <Filter>ソース ファイル\math</Filter>
+    <ClCompile Include="transformationmatrix\TransformationMatrix.cpp">
+      <Filter>ソース ファイル\transformationmatrix</Filter>
+    </ClCompile>
+    <ClCompile Include="imguimanager\ImGuiManager.cpp">
+      <Filter>ソース ファイル\imguimanager</Filter>
+    </ClCompile>
+    <ClCompile Include="texture\Texture.cpp">
+      <Filter>ソース ファイル\texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,10 +152,19 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="model\Model.h">
-      <Filter>ヘッダー ファイル\model</Filter>
+    <ClInclude Include="scene\GameScene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="base\DirectX.h">
+    <ClInclude Include="scene\IScene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\TitleScene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="base\D3DResourceLeakChecker.h">
+      <Filter>ヘッダー ファイル\base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\DirectXCommon.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
     <ClInclude Include="base\WinApp.h">
@@ -113,17 +173,30 @@
     <ClInclude Include="math\MathFunction.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
-    <ClInclude Include="base\D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル\base</Filter>
+    <ClInclude Include="scene\GameManager.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shader\Object3d.VS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\Object3d.PS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
+    <ClInclude Include="model\DirectionalLight.h">
+      <Filter>ヘッダー ファイル\model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Material.h">
+      <Filter>ヘッダー ファイル\model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Mesh.h">
+      <Filter>ヘッダー ファイル\model</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Model.h">
+      <Filter>ヘッダー ファイル\model</Filter>
+    </ClInclude>
+    <ClInclude Include="transformationmatrix\TransformationMatrix.h">
+      <Filter>ヘッダー ファイル\transformationmatrix</Filter>
+    </ClInclude>
+    <ClInclude Include="imguimanager\ImGuiManager.h">
+      <Filter>ヘッダー ファイル\imguimanager</Filter>
+    </ClInclude>
+    <ClInclude Include="texture\Texture.h">
+      <Filter>ヘッダー ファイル\texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -132,7 +205,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\Object3d.hlsli">
-      <Filter>Shader</Filter>
+      <Filter>shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shader\Object3d.PS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\Object3d.VS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

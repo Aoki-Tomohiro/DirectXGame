@@ -2,6 +2,37 @@
 #include <fstream>
 #include <sstream>
 
+DirectXCommon* Model::directX_;
+IDxcUtils* Model::dxcUtils_;
+IDxcCompiler3* Model::dxcCompiler_;
+IDxcIncludeHandler* Model::includeHandler_;
+ID3DBlob* Model::signatureBlob_;
+ID3DBlob* Model::errorBlob_;
+Microsoft::WRL::ComPtr<ID3D12RootSignature>  Model::rootSignature_;
+IDxcBlob* Model::vertexShaderBlob_;
+IDxcBlob* Model::pixelShaderBlob_;
+Microsoft::WRL::ComPtr<ID3D12PipelineState>  Model::graphicsPipelineState_;
+D3D12_VIEWPORT  Model::viewport_;
+D3D12_RECT  Model::scissorRect_;
+std::unique_ptr<DirectionalLight> Model::directionalLight_;
+
+void Model::Initialize() {
+	directX_ = DirectXCommon::GetInstance();
+	//DXCCompilerの初期化
+	Model::InitializeDXCCompiler();
+	//パイプラインステートの作成
+	Model::CreatePipelineStateObject();
+	//ビューポートの作成
+	Model::CreateViewport();
+	//シザーレクトの作成
+	Model::CreateScissorRect();
+	//DirectionalLightの作成
+	directionalLight_ = std::make_unique<DirectionalLight>();
+	directionalLight_->Create();
+}
+
+Model::Model() {};
+
 Model::~Model() {
 	signatureBlob_->Release();
 	if (errorBlob_) {
@@ -11,12 +42,29 @@ Model::~Model() {
 	vertexShaderBlob_->Release();
 }
 
-void Model::Initialize(DirectXCommon* directX) {
-	directX_ = directX;
-	Model::InitializeDXCCompiler();
-	Model::CreatePipelineStateObject();
-	Model::CreateViewport();
-	Model::CreateScissorRect();
+void Model::Create(std::vector<VertexData> vertices, Texture* texture) {
+	//メッシュの作成
+	mesh_ = std::make_unique<Mesh>();
+	mesh_->Create(vertices);
+	//マテリアルの作成
+	material_ = std::make_unique<Material>();
+	material_->Create();
+	//テクスチャを渡す
+	texture_.reset(texture);
+}
+
+void Model::CreateFromOBJ(const std::string& directoryPath, const std::string& filename) {
+	//モデルの読み込み
+	modelData_ = Model::LoadObjFile(directoryPath, filename);
+	//メッシュの作成
+	mesh_ = std::make_unique<Mesh>();
+	mesh_->Create(modelData_.vertices);
+	//マテリアルの作成
+	material_ = std::make_unique<Material>();
+	material_->Create();
+	//テクスチャの読み込み
+	texture_.reset(new Texture());
+	texture_->Load(modelData_.material.textureFilePath);
 }
 
 void Model::InitializeDXCCompiler() {
@@ -98,14 +146,12 @@ void Model::CreatePipelineStateObject() {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
 	//DescriptorRange
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;//0から始まる
 	descriptorRange[0].NumDescriptors = 1;//数は一つ
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
-
 	//RootParameter作成。複数設定できるので配列。今回は結果一つだけなので長さ１の配列
 	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
@@ -123,7 +169,6 @@ void Model::CreatePipelineStateObject() {
 	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
-
 	//Sampler
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//バイリニアフィルタ
@@ -136,7 +181,6 @@ void Model::CreatePipelineStateObject() {
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
 	//シリアライズしてバイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
@@ -148,7 +192,6 @@ void Model::CreatePipelineStateObject() {
 	hr = directX_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
 		signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
-
 
 	//InputLayout
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
@@ -168,12 +211,10 @@ void Model::CreatePipelineStateObject() {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-
 	//BlendStateの設定
 	//すべての色要素を書き込む
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
 
 	//RasterizerStateの設定を行う
 	//裏面(時計回り)を表示しない
@@ -181,7 +222,6 @@ void Model::CreatePipelineStateObject() {
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	//三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
 
 	//Shaderをコンパイルする
 	vertexShaderBlob_ = CompileShader(L"shader/Object3d.VS.hlsl",
@@ -192,7 +232,6 @@ void Model::CreatePipelineStateObject() {
 		L"ps_6_0", dxcUtils_, dxcCompiler_, includeHandler_);
 	assert(pixelShaderBlob_ != nullptr);
 
-
 	//DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	//Depthの機能を有効化する
@@ -202,7 +241,7 @@ void Model::CreatePipelineStateObject() {
 	//比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-
+	//グラフィックスパイプラインステートの作成
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
@@ -228,78 +267,22 @@ void Model::CreatePipelineStateObject() {
 	assert(SUCCEEDED(hr));
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes) {
-	//頂点リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//UploadHeapを使う
-	//頂点リソースの設定
-	D3D12_RESOURCE_DESC resourceDesc{};
-	//バッファリソース。テクスチャの場合はまた別の設定をする
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resourceDesc.Width = sizeInBytes;
-	//バッファの場合はこれらは１にする決まり
-	resourceDesc.Height = 1;
-	resourceDesc.DepthOrArraySize = 1;
-	resourceDesc.MipLevels = 1;
-	resourceDesc.SampleDesc.Count = 1;
-	//バッファの場合はこれにする決まり
-	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	//実際に頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-		IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr));
-	return resource;
+void Model::CreateViewport() {
+	//クライアント領域のサイズと一緒にして画面全体に表示
+	viewport_.Width = float(directX_->GetWinApp()->kClientWidth);
+	viewport_.Height = float(directX_->GetWinApp()->kClientHeight);
+	viewport_.TopLeftX = 0;
+	viewport_.TopLeftY = 0;
+	viewport_.MinDepth = 0.0f;
+	viewport_.MaxDepth = 1.0f;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateVertexResource(D3D12_VERTEX_BUFFER_VIEW& vertexBufferView, UINT sizeInBytes, VertexData* vertexData, uint32_t vertexCount) {
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
-	//vertexBufferViewを作成
-	vertexResource = CreateBufferResource(directX_->GetDevice(), sizeInBytes);
-
-	//リソースの先頭のアドレスから使う
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点三つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeInBytes;
-	//１頂点当たりのサイズ
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
-	VertexData* vertexData_ = nullptr;
-	//書き込むためのアドレスを取得
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	for (uint32_t i = 0; i < vertexCount; i++) {
-		vertexData_[i] = vertexData[i];
-	}
-	return vertexResource;
-}
-
-Microsoft::WRL::ComPtr<ID3D12Resource> Model::CreateMaterialData(Material* color) {
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
-	materialResource = CreateBufferResource(directX_->GetDevice(), sizeof(Material));
-
-	//マテリアルにデータを書き込む
-	Material* materialData = nullptr;
-	//書き込むためのアドレスを取得
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	//今回は赤を書き込んでみる
-	*materialData = *color;
-
-	return materialResource;
-}
-
-void Model::UpdateMaterialData(const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, Material* materialData) {
-	Material* material = nullptr;
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&material));
-	*material = *materialData;
-}
-
-void Model::UpdateMatrix(const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, TransformationMatrix matrix) {
-	//データを書き込む
-	TransformationMatrix* wvpData = nullptr;
-	//書き込むためのアドレスを取得
-	WVPResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-	//単位行列を書き込んでおく
-	*wvpData = matrix;
+void Model::CreateScissorRect() {
+	//基本的にビューポートと同じ矩形が構成されるようにする
+	scissorRect_.left = 0;
+	scissorRect_.right = directX_->GetWinApp()->kClientWidth;
+	scissorRect_.top = 0;
+	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
 }
 
 ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
@@ -394,51 +377,23 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 	return materialData;
 }
 
-void Model::CreateViewport() {
-	//クライアント領域のサイズと一緒にして画面全体に表示
-	viewport_.Width = float(directX_->GetWinApp()->kClientWidth);
-	viewport_.Height = float(directX_->GetWinApp()->kClientHeight);
-	viewport_.TopLeftX = 0;
-	viewport_.TopLeftY = 0;
-	viewport_.MinDepth = 0.0f;
-	viewport_.MaxDepth = 1.0f;
-}
-
-void Model::CreateScissorRect() {
-	//基本的にビューポートと同じ矩形が構成されるようにする
-	scissorRect_.left = 0;
-	scissorRect_.right = directX_->GetWinApp()->kClientWidth;
-	scissorRect_.top = 0;
-	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
-}
-
-void Model::Draw(D3D12_VERTEX_BUFFER_VIEW* vertexBufferView, UINT vertexCount, const Microsoft::WRL::ComPtr<ID3D12Resource>& materialResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& WVPResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& lightingResource, bool useMonsterBall, D3D12_INDEX_BUFFER_VIEW* indexBufferView) {
-	//GPUハンドルを取得
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandles[2];
-	srvHandles[0] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 1);
-	srvHandles[1] = directX_->GetGPUDescriptorHandle(directX_->GetSRVDescriptorHeap(), directX_->descriptorSizeSRV, 2);
-
-	directX_->GetCommandList()->RSSetViewports(1, &viewport_);//viewportを設定
-	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);//Scissorを設定
-	//RootSignatureを設定。PSOに設定しているけど別途設定が必要
+void Model::Draw(TransformationMatrix* transformationMatrix) {
+	//viewportを設定
+	directX_->GetCommandList()->RSSetViewports(1, &viewport_);
+	//ScissorRectを設定
+	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
+	//RootSignatureを設定
 	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
-	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());//PSOを設定
-	directX_->GetCommandList()->IASetVertexBuffers(0, 1, vertexBufferView);//VBVを設定
-	if (indexBufferView != nullptr) {
-		directX_->GetCommandList()->IASetIndexBuffer(indexBufferView);//IBVを設定
-	}
-	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightingResource->GetGPUVirtualAddress());
-	directX_->GetCommandList()->SetGraphicsRootConstantBufferView(1, WVPResource->GetGPUVirtualAddress());
-	//SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
-	directX_->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? srvHandles[1] : srvHandles[0]);
-	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	directX_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//描画！(DrawCall/ドローコール)。３頂点で一つのインスタンス、インスタンスについては今後
-	if (indexBufferView != nullptr) {
-		directX_->GetCommandList()->DrawIndexedInstanced(vertexCount, 1, 0, 0, 0);
-	}
-	else {
-		directX_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
-	}
+	//PSOを設定
+	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+	//transformationMatrixを設定
+	transformationMatrix->SetGraphicsCommand();
+	//マテリアルを設定
+	material_->SetGraphicsCommand();
+	//テクスチャを設定
+	texture_->SetGraphicsCommand();
+	//directionalLightを設定
+	directionalLight_->SetGraphicsCommand();
+	//描画
+	mesh_->Draw();
 }

@@ -3,12 +3,24 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-WinApp::~WinApp() {
-	CloseWindow(hwnd_);
+WinApp* WinApp::instance;
+
+WinApp* WinApp::GetInstance() {
+	if (instance == nullptr) {
+		instance = new WinApp();
+	}
+	return instance;
+}
+
+void WinApp::DeleteInstance() {
+	if (instance != nullptr) {
+		delete instance;
+		instance = nullptr;
+	}
 }
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	
+
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
@@ -67,6 +79,10 @@ std::string WinApp::ConvertString(const std::wstring& str)
 }
 
 void WinApp::CreateGameWindow(const wchar_t* title, int32_t kClientWidth, int32_t kClientHeight) {
+
+	//COM初期化
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	//ウィンドウプロシージャ
 	wc_.lpfnWndProc = WindowProc;
 	//ウィンドウクラス名(なんでも良い)
@@ -104,6 +120,13 @@ void WinApp::CreateGameWindow(const wchar_t* title, int32_t kClientWidth, int32_
 
 	//ウィンドウを表示する
 	ShowWindow(hwnd_, SW_SHOW);
+}
+
+void WinApp::CloseGameWindow() {
+	CloseWindow(hwnd_);
+	
+	//COM終了
+	CoUninitialize();
 }
 
 bool WinApp::MessageRoop() {
