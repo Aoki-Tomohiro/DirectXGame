@@ -240,8 +240,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateShrinkBuffer(const M
 	//リソースの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	resourceDesc.Width = winApp_->kClientWidth / 4;
-	resourceDesc.Height = winApp_->kClientHeight / 4;
+	resourceDesc.Width = winApp_->kClientWidth / 2;
+	resourceDesc.Height = winApp_->kClientHeight / 2;
 	resourceDesc.DepthOrArraySize = 1;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;

@@ -82,7 +82,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	transformationMatrixSprite_->Initialize();
 	//utahTeapot
 	modelUtahTeapot_ = std::make_unique<Model>();
-	modelUtahTeapot_->CreateFromOBJ("resources", "teapot.obj");
+	modelUtahTeapot_->CreateFromOBJ("resources", "multiMesh.obj");
 	transformationMatrixUtahTeapot_ = std::make_unique<TransformationMatrix>();
 	transformationMatrixUtahTeapot_->Initialize();
 	//StanfordBunny

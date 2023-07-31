@@ -46,5 +46,5 @@ public:
 	//スケール
 	float scale_ = 0.5f;
 	//減衰率
-	float attenuationRate_ = 1.0f;
+	float attenuationRate_ = 2.0f;
 };

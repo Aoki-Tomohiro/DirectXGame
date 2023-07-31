@@ -359,8 +359,8 @@ void GaussianBlur::HorizontalShrinkBlur() {
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSRVDescriptorHeap(), dxCommon_->descriptorSizeSRV, 1);
 	//ビューポートを設定
 	D3D12_VIEWPORT viewport{};
-	viewport.Height = float(dxCommon_->GetWinApp()->kClientHeight) / 4;
-	viewport.Width = float(dxCommon_->GetWinApp()->kClientWidth) / 4;
+	viewport.Height = float(dxCommon_->GetWinApp()->kClientHeight) / 2;
+	viewport.Width = float(dxCommon_->GetWinApp()->kClientWidth) / 2;
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	//シザーレクトを設定
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
@@ -380,8 +380,8 @@ void GaussianBlur::VerticalShrinkBlur() {
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSRVDescriptorHeap(), dxCommon_->descriptorSizeSRV, 3);
 	//ビューポートを設定
 	D3D12_VIEWPORT viewport{};
-	viewport.Height = float(dxCommon_->GetWinApp()->kClientHeight) / 4;
-	viewport.Width = float(dxCommon_->GetWinApp()->kClientWidth) / 4;
+	viewport.Height = float(dxCommon_->GetWinApp()->kClientHeight) / 2;
+	viewport.Width = float(dxCommon_->GetWinApp()->kClientWidth) / 2;
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport);
 	//Scissorを設定
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);

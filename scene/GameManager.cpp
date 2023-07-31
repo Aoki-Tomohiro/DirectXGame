@@ -55,6 +55,8 @@ int GameManager::run() {
 		ImGui::Begin(" ");
 		if (ImGui::TreeNode("PostProcess")) {
 			ImGui::Checkbox("Fog:enable", &postProcess_->GetFog()->enable_);
+			ImGui::DragFloat("Fog:scale", &postProcess_->GetFog()->scale_,0.01f);
+			ImGui::DragFloat("Fog:attenuationRate", &postProcess_->GetFog()->attenuationRate_, 0.01f);
 			ImGui::Checkbox("Dof:enable", &postProcess_->GetDof()->enable_);
 			ImGui::Checkbox("LensDistortion:enable", &postProcess_->GetLensDistortion()->enable_);
 			ImGui::Checkbox("Vignette:enable", &postProcess_->GetVignette()->enable_);

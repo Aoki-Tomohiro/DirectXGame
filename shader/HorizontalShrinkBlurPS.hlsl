@@ -21,8 +21,8 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	//画像の大きさを取得
 	gTexture.GetDimensions(0, w, h, level);
 	//縮小バッファのサイズに合わせる
-	w /= 4;
-	h /= 4;
+	w /= 2;
+	h /= 2;
 	float dx = 1.0f / w;
 	float dy = 1.0f / h;
 
