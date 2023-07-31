@@ -57,7 +57,7 @@ private:
 	std::unique_ptr<Model> modelStanfordBunny_ = nullptr;
 	std::unique_ptr<TransformationMatrix> transformationMatrixStanfordBunny_ = nullptr;
 	//imgui用
-	bool drawTriangle_ = false;
+	bool drawTriangle_ = true;
 	bool drawSphere_ = false;
 	bool drawSprite_ = false;
 	bool drawUtahTeapot_ = false;
