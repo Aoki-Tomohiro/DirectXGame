@@ -8,24 +8,24 @@ struct VertexData {
 	Vector3 normal;
 };
 
-class Mesh {
+class Vertex {
 public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	Mesh();
+	Vertex();
 
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Mesh();
+	~Vertex();
 
 	/// <summary>
 	/// メッシュの作成
 	/// </summary>
 	/// <param name="dxCommon"></param>
 	/// <param name="vertices"></param>
-	void Create(std::vector<VertexData> vertices);
+	void Create(const std::vector<VertexData>& vertices);
 
 	/// <summary>
 	/// 描画

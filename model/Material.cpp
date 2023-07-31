@@ -11,6 +11,7 @@ void Material::Create() {
 	//マテリアルリソースに書き込む
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;
+	materialData_->lightingMethod = lightingMethod_;
 	materialData_->enableLighting = enableLighting_;
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialResource_->Unmap(0, nullptr);
@@ -25,6 +26,7 @@ void Material::Update() {
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;
 	materialData_->enableLighting = enableLighting_;
+	materialData_->lightingMethod = lightingMethod_;
 	materialData_->uvTransform = uvTransformMatrix;
 	materialResource_->Unmap(0, nullptr);
 }

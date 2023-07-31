@@ -2,10 +2,16 @@
 #include "DirectXCommon.h"
 #include "MathFunction.h"
 
+enum LightingMethod {
+	LambertianReflectance,
+	HalfLambert
+};
+
 struct ConstBufferDataMaterial {
 	Vector4 color;
 	int32_t enableLighting;
-	float padding[3];
+	int32_t lightingMethod;
+	float padding[2];
 	Matrix4x4 uvTransform;
 };
 
@@ -49,4 +55,6 @@ public:
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	//ライティングのフラグ
 	int32_t enableLighting_ = true;
+	//ライティング方式
+	int32_t lightingMethod_ = LambertianReflectance;
 };

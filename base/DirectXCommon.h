@@ -63,20 +63,26 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const Microsoft::WRL::ComPtr<ID3D12Device>& device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	
 	/// <summary>
+	///マルチパス用リソースの作成 
+	/// </summary>
+	/// <param name="device"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateMultiPassResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device);
+
+	/// <summary>
+	/// 縮小バッファの作成
+	/// </summary>
+	/// <param name="device"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateShrinkBuffer(const Microsoft::WRL::ComPtr<ID3D12Device>& device);
+
+	/// <summary>
 	/// バッファリソースの作成
 	/// </summary>
 	/// <param name="device"></param>
 	/// <param name="sizeInBytes"></param>
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, size_t sizeInBytes);
-	
-	///// <summary>
-	///// テクスチャリソースの作成
-	///// </summary>
-	///// <param name="device"></param>
-	///// <param name="metadata"></param>
-	///// <returns></returns>
-	//Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metadata);
 	
 	/// <summary>
 	/// 深度バッファの作成
@@ -105,23 +111,20 @@ public:
 	/// </summary>
 	void CreateDepthStencilView();
 
-	///// <summary>
-	///// テクスチャの読み込み
-	///// </summary>
-	///// <param name="filePath"></param>
-	///// <returns></returns>
-	//DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	/// <summary>
+	/// マルチパス用レンダーターゲットビューの作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <returns></returns>
+	void CreateMultiPassRTV(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource);
 
-	///// <summary>
-	///// テクスチャをアップロード
-	///// </summary>
-	///// <param name="texture"></param>
-	///// <param name="mipImages"></param>
-	///// <param name="device"></param>
-	///// <param name="commandList"></param>
-	///// <returns></returns>
-	//Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages, const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList);
-	
+	/// <summary>
+	/// マルチパス用シェーダーリソースビューの作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <returns></returns>
+	void CreateMultiPassSRV(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
+
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
 	/// </summary>
@@ -141,14 +144,64 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const uint32_t descriptorSize, uint32_t index);
 
 	/// <summary>
-	/// 描画前処理
+	/// 一パス目の描画前処理
 	/// </summary>
-	void PreDraw();
+	void FirstPassPreDraw();
 
 	/// <summary>
-	/// 描画処理
+	/// 一パス目の描画後処理
 	/// </summary>
-	void PostDraw();
+	void FirstPassPostDraw();
+
+	/// <summary>
+	/// 二パス目の描画前処理
+	/// </summary>
+	void SecondPassPreDraw();
+
+	/// <summary>
+	/// 二パス目の描画後処理
+	/// </summary>
+	void SecondPassPostDraw();
+
+	/// <summary>
+	/// 横ぼかし描画前処理
+	/// </summary>
+	void HorizontalBlurPreDraw();
+
+	/// <summary>
+	/// 横ぼかし描画後処理
+	/// </summary>
+	void HorizontalBlurPostDraw();
+
+	/// <summary>
+	/// 縦ぼかし描画前処理
+	/// </summary>
+	void VerticalBlurPreDraw();
+
+	/// <summary>
+	/// 縦ぼかし描画後処理
+	/// </summary>
+	void VerticalBlurPostDraw();
+
+	/// <summary>
+	/// 横縮小ぼかし描画前処理
+	/// </summary>
+	void HorizontalShrinkBlurPreDraw();
+
+	/// <summary>
+	/// 横縮小ぼかし描画後処理
+	/// </summary>
+	void HorizontalShrinkBlurPostDraw();
+
+	/// <summary>
+	/// 縦縮小ぼかし描画前処理
+	/// </summary>
+	void VerticalShrinkBlurPreDraw();
+
+	/// <summary>
+	/// 縦縮小ぼかし描画後処理
+	/// </summary>
+	void VerticalShrinkBlurPostDraw();
 
 	/// <summary>
 	/// ウィンドウズアプリケーションの取得
@@ -224,6 +277,17 @@ private:
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
-	//SRVNumber
+	//viewの場所
+	uint32_t rtvIndex_ = -1;
 	uint32_t srvIndex_ = 0;
+	//マルチパスレンダリング用RTVDescriptorHeap
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> multiPassRTVDescriptorHeap_ = nullptr;
+	//一パス目のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> firstPassResource_ = nullptr;
+	//Blur用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> blurResource_[2] = { nullptr };
+	//縮小バッファ
+	Microsoft::WRL::ComPtr<ID3D12Resource> shrinkBlurResource_[2] = { nullptr };
+	//深度書き込み用
+	Microsoft::WRL::ComPtr<ID3D12Resource> linearDepthStensilResource_ = nullptr;
 };

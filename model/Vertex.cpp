@@ -1,12 +1,12 @@
-#include "Mesh.h"
+#include "Vertex.h"
 
-Mesh::Mesh() {
+Vertex::Vertex() {
 	dxCommon_ = DirectXCommon::GetInstance();
 }
 
-Mesh::~Mesh() {};
+Vertex::~Vertex() {};
 
-void Mesh::Create(std::vector<VertexData> vertices) {
+void Vertex::Create(const std::vector<VertexData>& vertices) {
 	//頂点情報を取得
 	vertices_ = vertices;
 	//頂点バッファを作成
@@ -20,7 +20,7 @@ void Mesh::Create(std::vector<VertexData> vertices) {
 	std::memcpy(vertexData, vertices_.data(), sizeof(VertexData) * vertices_.size());
 }
 
-void Mesh::Draw() {
+void Vertex::Draw() {
 	//VBVを設定
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定

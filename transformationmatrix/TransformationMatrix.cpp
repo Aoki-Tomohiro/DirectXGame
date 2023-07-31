@@ -10,7 +10,7 @@ void TransformationMatrix::Initialize() {
 	wvpResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(ConstBufferDataTransformationMatrix));
 	//wvpResourceに書き込む
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	wvpData_->WVP = MakeIdentity4x4();
+	wvpData_->WVP = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	wvpData_->World = MakeIdentity4x4();
 	wvpResource_->Unmap(0, nullptr);
 }

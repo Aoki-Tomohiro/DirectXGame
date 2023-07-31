@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXCommon.h"
-#include "Mesh.h"
+#include "Vertex.h"
 #include "Material.h"
 #include "Texture.h"
 #include "DirectionalLight.h"
@@ -76,7 +76,7 @@ public:
 	/// <summary>
 	/// モデルの作成
 	/// </summary>
-	void Create(std::vector<VertexData> vertices,Texture* texture);
+	void Create(const std::vector<VertexData>& vertices,Texture* texture);
 
 	/// <summary>
 	/// OBJからモデルの作成
@@ -118,7 +118,7 @@ public:
 
 private:
 	//DirectXCommon
-	static DirectXCommon* directX_;
+	static DirectXCommon* dxCommon_;
 	//dxcCompiler
 	static IDxcUtils* dxcUtils_;
 	static IDxcCompiler3* dxcCompiler_;
@@ -141,7 +141,7 @@ private:
 	//モデルデータ
 	ModelData modelData_;
 	//メッシュ
-	std::unique_ptr<Mesh> mesh_ = nullptr;
+	std::unique_ptr<Vertex> vertex_ = nullptr;
 	//マテリアル
 	std::unique_ptr<Material> material_ = nullptr;
 	//テクスチャ

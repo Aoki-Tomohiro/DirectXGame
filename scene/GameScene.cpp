@@ -18,6 +18,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	triangle_.push_back(VertexData{ {0.5f,-0.5f,0.0f,1.0f},{1.0f,1.0f},{0.0f,0.0f,-1.0f} });
 	model_ = std::make_unique<Model>();
 	model_->Create(triangle_, texture_.get());
+	model_->GetMaterial()->enableLighting_ = false;
 	transformationMatrix_ = std::make_unique<TransformationMatrix>();
 	transformationMatrix_->Initialize();
 	//球
@@ -77,75 +78,130 @@ void GameScene::Initialize(GameManager* gameManager) {
 	modelSprite_ = std::make_unique<Model>();
 	modelSprite_->Create(sprite_, texture_.get());
 	modelSprite_->GetMaterial()->enableLighting_ = false;
-	modelSprite_->GetMaterial()->Update();
 	transformationMatrixSprite_ = std::make_unique<TransformationMatrix>();
 	transformationMatrixSprite_->Initialize();
-	////utahTeapot
-	//modelUtahTeapot_ = std::make_unique<Model>();
-	//modelUtahTeapot_->CreateFromOBJ("resources", "teapot.obj");
-	//transformationMatrixUtahTeapot_ = std::make_unique<TransformationMatrix>();
-	//transformationMatrixUtahTeapot_->Initialize();
-	////StanfordBunny
-	//modelStanfordBunny_ = std::make_unique<Model>();
-	//modelStanfordBunny_->CreateFromOBJ("resources", "bunny.obj");
-	//transformationMatrixStanfordBunny_ = std::make_unique<TransformationMatrix>();
-	//transformationMatrixStanfordBunny_->Initialize();
+	//utahTeapot
+	modelUtahTeapot_ = std::make_unique<Model>();
+	modelUtahTeapot_->CreateFromOBJ("resources", "teapot.obj");
+	transformationMatrixUtahTeapot_ = std::make_unique<TransformationMatrix>();
+	transformationMatrixUtahTeapot_->Initialize();
+	//StanfordBunny
+	modelStanfordBunny_ = std::make_unique<Model>();
+	modelStanfordBunny_->CreateFromOBJ("resources", "bunny.obj");
+	transformationMatrixStanfordBunny_ = std::make_unique<TransformationMatrix>();
+	transformationMatrixStanfordBunny_->Initialize();
 };
 
 void GameScene::Update(GameManager* gameManager) {
 	//三角形
-	transformationMatrix_->transform_ = transform_;
 	transformationMatrix_->worldMatrix_ = MakeAffineMatrix(transformationMatrix_->transform_.scale, transformationMatrix_->transform_.rotate, transformationMatrix_->transform_.translate);
 	transformationMatrix_->cameraMatrix_ = MakeAffineMatrix(transformationMatrix_->cameraTransform_.scale, transformationMatrix_->cameraTransform_.rotate, transformationMatrix_->cameraTransform_.translate);
 	transformationMatrix_->viewMatrix_ = Inverse(transformationMatrix_->cameraMatrix_);
 	transformationMatrix_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
 	transformationMatrix_->Update();
+	model_->GetMaterial()->Update();
 	//球
 	transformationMatrixSphere_->worldMatrix_ = MakeAffineMatrix(transformationMatrixSphere_->transform_.scale, transformationMatrixSphere_->transform_.rotate, transformationMatrixSphere_->transform_.translate);
 	transformationMatrixSphere_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixSphere_->cameraTransform_.scale, transformationMatrixSphere_->cameraTransform_.rotate, transformationMatrixSphere_->cameraTransform_.translate);
 	transformationMatrixSphere_->viewMatrix_ = Inverse(transformationMatrixSphere_->cameraMatrix_);
 	transformationMatrixSphere_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
 	transformationMatrixSphere_->Update();
+	modelSphere_->GetMaterial()->Update();
 	//スプライト
 	transformationMatrixSprite_->worldMatrix_ = MakeAffineMatrix(transformationMatrixSprite_->transform_.scale, transformationMatrixSprite_->transform_.rotate, transformationMatrixSprite_->transform_.translate);
 	transformationMatrixSprite_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixSprite_->cameraTransform_.scale, transformationMatrixSprite_->cameraTransform_.rotate, transformationMatrixSprite_->cameraTransform_.translate);
 	transformationMatrixSprite_->viewMatrix_ = MakeIdentity4x4();
 	transformationMatrixSprite_->projectionMatrix_ = MakeOrthographicMatrix(0.0f, 0.0f, float(dxCommon_->GetWinApp()->kClientWidth), float(dxCommon_->GetWinApp()->kClientHeight), 0.0f, 100.0f);
 	transformationMatrixSprite_->Update();
-	////utahTeapot
-	//transformationMatrixUtahTeapot_->worldMatrix_ = MakeAffineMatrix(transformationMatrixUtahTeapot_->transform_.scale, transformationMatrixUtahTeapot_->transform_.rotate, transformationMatrixUtahTeapot_->transform_.translate);
-	//transformationMatrixUtahTeapot_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixUtahTeapot_->cameraTransform_.scale, transformationMatrixUtahTeapot_->cameraTransform_.rotate, transformationMatrixUtahTeapot_->cameraTransform_.translate);
-	//transformationMatrixUtahTeapot_->viewMatrix_ = Inverse(transformationMatrixUtahTeapot_->cameraMatrix_);
-	//transformationMatrixUtahTeapot_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
-	//transformationMatrixUtahTeapot_->Update();
-	////stanfordBunny
-	//transformationMatrixStanfordBunny_->worldMatrix_ = MakeAffineMatrix(transformationMatrixStanfordBunny_->transform_.scale, transformationMatrixStanfordBunny_->transform_.rotate, transformationMatrixStanfordBunny_->transform_.translate);
-	//transformationMatrixStanfordBunny_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixStanfordBunny_->cameraTransform_.scale, transformationMatrixStanfordBunny_->cameraTransform_.rotate, transformationMatrixStanfordBunny_->cameraTransform_.translate);
-	//transformationMatrixStanfordBunny_->viewMatrix_ = Inverse(transformationMatrixStanfordBunny_->cameraMatrix_);
-	//transformationMatrixStanfordBunny_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
-	//transformationMatrixStanfordBunny_->Update();
-
-	//色の変更
-	model_->GetMaterial()->color_ = materialColor_;
-	model_->GetMaterial()->Update();
-	//directionalLightの変更
-	model_->GetDirectionalLight()->color_ = lightColor_;
-	model_->GetDirectionalLight()->Update();
+	modelSprite_->GetMaterial()->Update();
+	//utahTeapot
+	transformationMatrixUtahTeapot_->worldMatrix_ = MakeAffineMatrix(transformationMatrixUtahTeapot_->transform_.scale, transformationMatrixUtahTeapot_->transform_.rotate, transformationMatrixUtahTeapot_->transform_.translate);
+	transformationMatrixUtahTeapot_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixUtahTeapot_->cameraTransform_.scale, transformationMatrixUtahTeapot_->cameraTransform_.rotate, transformationMatrixUtahTeapot_->cameraTransform_.translate);
+	transformationMatrixUtahTeapot_->viewMatrix_ = Inverse(transformationMatrixUtahTeapot_->cameraMatrix_);
+	transformationMatrixUtahTeapot_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
+	transformationMatrixUtahTeapot_->Update();
+	modelUtahTeapot_->GetMaterial()->Update();
+	//stanfordBunny
+	transformationMatrixStanfordBunny_->worldMatrix_ = MakeAffineMatrix(transformationMatrixStanfordBunny_->transform_.scale, transformationMatrixStanfordBunny_->transform_.rotate, transformationMatrixStanfordBunny_->transform_.translate);
+	transformationMatrixStanfordBunny_->cameraMatrix_ = MakeAffineMatrix(transformationMatrixStanfordBunny_->cameraTransform_.scale, transformationMatrixStanfordBunny_->cameraTransform_.rotate, transformationMatrixStanfordBunny_->cameraTransform_.translate);
+	transformationMatrixStanfordBunny_->viewMatrix_ = Inverse(transformationMatrixStanfordBunny_->cameraMatrix_);
+	transformationMatrixStanfordBunny_->projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWinApp()->kClientWidth) / float(dxCommon_->GetWinApp()->kClientHeight), 0.1f, 100.0f);
+	transformationMatrixStanfordBunny_->Update();
+	modelStanfordBunny_->GetMaterial()->Update();
 
 	ImGui::Begin(" ");
-	ImGui::DragFloat3("transformationMatrix.translate", &transform_.translate.x, 0.01f);
-	ImGui::DragFloat3("transformationMatrix.rotate", &transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("transformationMatrix.scale", &transform_.scale.x, 0.01f);
-	ImGui::ColorEdit3("materialColor", &materialColor_.x);
-	ImGui::ColorEdit3("lightColor", &lightColor_.x);
-	ImGui::Checkbox("enableLighting", reinterpret_cast<bool*>(&modelSprite_->GetMaterial()->enableLighting_));
+	if (ImGui::TreeNode("Triangle")) {
+		ImGui::Checkbox("Draw", &drawTriangle_);
+		ImGui::DragFloat3("translate", &transformationMatrix_->transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transformationMatrix_->transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transformationMatrix_->transform_.scale.x, 0.01f);
+		ImGui::ColorEdit4("color", &model_->GetMaterial()->color_.x);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Sphere")) {
+		ImGui::Checkbox("Draw", &drawSphere_);
+		ImGui::DragFloat3("translate", &transformationMatrixSphere_->transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transformationMatrixSphere_->transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transformationMatrixSphere_->transform_.scale.x, 0.01f);
+		ImGui::ColorEdit4("color", &modelSphere_->GetMaterial()->color_.x);
+		ImGui::Checkbox("enableLighting", reinterpret_cast<bool*>(&modelSphere_->GetMaterial()->enableLighting_));
+		if (ImGui::Button("LambertianReflectance")) {
+			modelSphere_->GetMaterial()->lightingMethod_ = LambertianReflectance;
+		}
+		if (ImGui::Button("HalfLambert")) {
+			modelSphere_->GetMaterial()->lightingMethod_ = HalfLambert;
+		}
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Sprite")) {
+		ImGui::Checkbox("Draw", &drawSprite_);
+		ImGui::DragFloat3("translate", &transformationMatrixSprite_->transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transformationMatrixSprite_->transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transformationMatrixSprite_->transform_.scale.x, 0.01f);
+		ImGui::DragFloat3("uvTranslate", &modelSprite_->GetMaterial()->uvTransform_.translate.x, 0.01f);
+		ImGui::DragFloat3("uvRotate", &modelSprite_->GetMaterial()->uvTransform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("uvScale", &modelSprite_->GetMaterial()->uvTransform_.scale.x, 0.01f);
+		ImGui::ColorEdit4("color", &modelSprite_->GetMaterial()->color_.x);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("UtahTeapot")) {
+		ImGui::Checkbox("utahTeapot", &drawUtahTeapot_);
+		ImGui::DragFloat3("translate", &transformationMatrixUtahTeapot_->transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transformationMatrixUtahTeapot_->transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transformationMatrixUtahTeapot_->transform_.scale.x, 0.01f);
+		ImGui::ColorEdit4("color", &modelUtahTeapot_->GetMaterial()->color_.x);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("StanfordBunny")) {
+		ImGui::Checkbox("Draw", &drawStanfordBunny_);
+		ImGui::DragFloat3("translate", &transformationMatrixStanfordBunny_->transform_.translate.x, 0.01f);
+		ImGui::DragFloat3("rotate", &transformationMatrixStanfordBunny_->transform_.rotate.x, 0.01f);
+		ImGui::DragFloat3("scale", &transformationMatrixStanfordBunny_->transform_.scale.x, 0.01f);
+		ImGui::ColorEdit4("color", &modelStanfordBunny_->GetMaterial()->color_.x);
+		ImGui::TreePop();
+	}
+	//ImGui::Checkbox("enableLighting", reinterpret_cast<bool*>(&modelSprite_->GetMaterial()->enableLighting_));
 	ImGui::End();
 };
 
 void GameScene::Draw(GameManager* gameManager) {
-	model_->Draw(transformationMatrix_.get());
-	//modelSphere_->Draw(transformationMatrixSphere_);
-	//modelSprite_->Draw(transformationMatrixSprite_);
-	//modelUtahTeapot_->Draw(transformationMatrixUtahTeapot_);
-	//modelStanfordBunny_->Draw(transformationMatrixStanfordBunny_);
+	if (drawTriangle_) {
+		model_->Draw(transformationMatrix_.get());
+	}
+
+	if (drawSphere_) {
+		modelSphere_->Draw(transformationMatrixSphere_.get());
+	}
+	
+	if (drawSprite_) {
+		modelSprite_->Draw(transformationMatrixSprite_.get());
+	}
+	
+	if (drawUtahTeapot_) {
+		modelUtahTeapot_->Draw(transformationMatrixUtahTeapot_.get());
+	}
+	
+	if (drawStanfordBunny_) {
+		modelStanfordBunny_->Draw(transformationMatrixStanfordBunny_.get());
+	}
 };

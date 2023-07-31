@@ -61,6 +61,12 @@
     <Filter Include="ヘッダー ファイル\texture">
       <UniqueIdentifier>{7ef1c402-15e3-4eb5-bf4b-fded32067223}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\postprocess">
+      <UniqueIdentifier>{b6b61018-12f3-4fba-8cde-5065ac01e8d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\postprocess">
+      <UniqueIdentifier>{bc84a277-f540-4e24-9d24-090aa5d88362}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -111,9 +117,6 @@
     <ClCompile Include="model\Material.cpp">
       <Filter>ソース ファイル\model</Filter>
     </ClCompile>
-    <ClCompile Include="model\Mesh.cpp">
-      <Filter>ソース ファイル\model</Filter>
-    </ClCompile>
     <ClCompile Include="model\Model.cpp">
       <Filter>ソース ファイル\model</Filter>
     </ClCompile>
@@ -125,6 +128,27 @@
     </ClCompile>
     <ClCompile Include="texture\Texture.cpp">
       <Filter>ソース ファイル\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\PostProcess.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\Fog.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\LensDistortion.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\GaussianBlur.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\Dof.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="postprocess\Vignette.cpp">
+      <Filter>ソース ファイル\postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Vertex.cpp">
+      <Filter>ソース ファイル\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +206,6 @@
     <ClInclude Include="model\Material.h">
       <Filter>ヘッダー ファイル\model</Filter>
     </ClInclude>
-    <ClInclude Include="model\Mesh.h">
-      <Filter>ヘッダー ファイル\model</Filter>
-    </ClInclude>
     <ClInclude Include="model\Model.h">
       <Filter>ヘッダー ファイル\model</Filter>
     </ClInclude>
@@ -197,6 +218,27 @@
     <ClInclude Include="texture\Texture.h">
       <Filter>ヘッダー ファイル\texture</Filter>
     </ClInclude>
+    <ClInclude Include="postprocess\PostProcess.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="postprocess\Fog.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="postprocess\LensDistortion.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="postprocess\GaussianBlur.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="postprocess\Dof.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="postprocess\Vignette.h">
+      <Filter>ヘッダー ファイル\postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Vertex.h">
+      <Filter>ヘッダー ファイル\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -207,12 +249,39 @@
     <None Include="shader\Object3d.hlsli">
       <Filter>shader</Filter>
     </None>
+    <None Include="shader\SecondPass.hlsli">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="shader\Blur.hlsli">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shader\Object3d.PS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="shader\Object3d.VS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\SecondPassPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\SecondPassVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\BlurVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\HorizontalBlurPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\HorizontalShrinkBlurPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\VerticalBlurPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\VerticalShrinkBlurPS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

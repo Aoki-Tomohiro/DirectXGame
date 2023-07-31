@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-DirectXCommon* Model::directX_;
+DirectXCommon* Model::dxCommon_;
 IDxcUtils* Model::dxcUtils_;
 IDxcCompiler3* Model::dxcCompiler_;
 IDxcIncludeHandler* Model::includeHandler_;
@@ -17,7 +17,7 @@ D3D12_RECT  Model::scissorRect_;
 std::unique_ptr<DirectionalLight> Model::directionalLight_;
 
 void Model::Initialize() {
-	directX_ = DirectXCommon::GetInstance();
+	dxCommon_ = DirectXCommon::GetInstance();
 	//DXCCompilerの初期化
 	Model::InitializeDXCCompiler();
 	//パイプラインステートの作成
@@ -42,10 +42,12 @@ Model::~Model() {
 	vertexShaderBlob_->Release();
 }
 
-void Model::Create(std::vector<VertexData> vertices, Texture* texture) {
+void Model::Create(const std::vector<VertexData>& vertices, Texture* texture) {
+	//nullチェック
+	assert(texture);
 	//メッシュの作成
-	mesh_ = std::make_unique<Mesh>();
-	mesh_->Create(vertices);
+	vertex_ = std::make_unique<Vertex>();
+	vertex_->Create(vertices);
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();
 	material_->Create();
@@ -57,8 +59,8 @@ void Model::CreateFromOBJ(const std::string& directoryPath, const std::string& f
 	//モデルの読み込み
 	modelData_ = Model::LoadObjFile(directoryPath, filename);
 	//メッシュの作成
-	mesh_ = std::make_unique<Mesh>();
-	mesh_->Create(modelData_.vertices);
+	vertex_ = std::make_unique<Vertex>();
+	vertex_->Create(modelData_.vertices);
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();
 	material_->Create();
@@ -82,7 +84,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
 	//1.hlslファイルを読む
 	//これからシェーダーをコンパイルする旨をログに出す
-	directX_->GetWinApp()->Log(directX_->GetWinApp()->ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	dxCommon_->GetWinApp()->Log(dxCommon_->GetWinApp()->ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -122,7 +124,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		directX_->GetWinApp()->Log(shaderError->GetStringPointer());
+		dxCommon_->GetWinApp()->Log(shaderError->GetStringPointer());
 		//警告・エラーダメゼッタイ
 		assert(false);
 	}
@@ -134,7 +136,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	//成功したログを出す
-	directX_->GetWinApp()->Log(directX_->GetWinApp()->ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
+	dxCommon_->GetWinApp()->Log(dxCommon_->GetWinApp()->ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
 	//もう使わないリソースを解放
 	shaderSource->Release();
 	shaderResult->Release();
@@ -185,11 +187,11 @@ void Model::CreatePipelineStateObject() {
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
 	if (FAILED(hr)) {
-		directX_->GetWinApp()->Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		dxCommon_->GetWinApp()->Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリを元に生成
-	hr = directX_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
+	hr = dxCommon_->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
 		signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 
@@ -252,7 +254,8 @@ void Model::CreatePipelineStateObject() {
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	//書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -263,14 +266,14 @@ void Model::CreatePipelineStateObject() {
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	//実際に生成
-	hr = directX_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
+	hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 }
 
 void Model::CreateViewport() {
 	//クライアント領域のサイズと一緒にして画面全体に表示
-	viewport_.Width = float(directX_->GetWinApp()->kClientWidth);
-	viewport_.Height = float(directX_->GetWinApp()->kClientHeight);
+	viewport_.Width = float(dxCommon_->GetWinApp()->kClientWidth);
+	viewport_.Height = float(dxCommon_->GetWinApp()->kClientHeight);
 	viewport_.TopLeftX = 0;
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
@@ -280,9 +283,9 @@ void Model::CreateViewport() {
 void Model::CreateScissorRect() {
 	//基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect_.left = 0;
-	scissorRect_.right = directX_->GetWinApp()->kClientWidth;
+	scissorRect_.right = dxCommon_->GetWinApp()->kClientWidth;
 	scissorRect_.top = 0;
-	scissorRect_.bottom = directX_->GetWinApp()->kClientHeight;
+	scissorRect_.bottom = dxCommon_->GetWinApp()->kClientHeight;
 }
 
 ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
@@ -379,13 +382,13 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 
 void Model::Draw(TransformationMatrix* transformationMatrix) {
 	//viewportを設定
-	directX_->GetCommandList()->RSSetViewports(1, &viewport_);
+	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport_);
 	//ScissorRectを設定
-	directX_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
+	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
 	//RootSignatureを設定
-	directX_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	//PSOを設定
-	directX_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 	//transformationMatrixを設定
 	transformationMatrix->SetGraphicsCommand();
 	//マテリアルを設定
@@ -395,5 +398,5 @@ void Model::Draw(TransformationMatrix* transformationMatrix) {
 	//directionalLightを設定
 	directionalLight_->SetGraphicsCommand();
 	//描画
-	mesh_->Draw();
+	vertex_->Draw();
 }

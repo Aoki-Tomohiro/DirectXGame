@@ -56,8 +56,10 @@ private:
 	//StanfordBunny
 	std::unique_ptr<Model> modelStanfordBunny_ = nullptr;
 	std::unique_ptr<TransformationMatrix> transformationMatrixStanfordBunny_ = nullptr;
-	//三角形
-	Transform transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	Vector4 materialColor_ = { 1.0f,1.0f,1.0f,1.0f };
-	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
+	//imgui用
+	bool drawTriangle_ = false;
+	bool drawSphere_ = false;
+	bool drawSprite_ = false;
+	bool drawUtahTeapot_ = false;
+	bool drawStanfordBunny_ = false;
 };
