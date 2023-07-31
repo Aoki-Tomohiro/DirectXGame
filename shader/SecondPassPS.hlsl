@@ -66,8 +66,8 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
 
 	//Fog
-	float x = (1.0f - 10.0f / 0.1f);
-	float y = (10.0f / 0.1f);
+	float x = (1.0f - 30.0f / 0.1f);
+	float y = (30.0f / 0.1f);
 	float linearDepthColor = 1.0f / (x * depthColor + y);
 	if (gFogParameter.enable == true) {
 		float fogWeight = 0.0f;
