@@ -54,27 +54,24 @@ PixelShaderOutput main(VertexShaderOutput input) {
 			textureColor = 0.0f;
 			blurColor = 0.0f;
 			shrinkBlurColor = 0.0f;
-			//linearDepthColor = 0.0f;
 			depthColor = 0.0f;
 		}
 		else {
 			textureColor = gTexture.Sample(gSampler, uvDistorted);
 			blurColor = gBlurTexture.Sample(gSampler, uvDistorted);
 			shrinkBlurColor = gShrinkBlurTexture.Sample(gSampler, uvDistorted);
-			//linearDepthColor = gLinearDepthTexture.Sample(gSampler, uvDistorted).r;
 			depthColor = gDepthTexture.Sample(gSampler, uvDistorted);
 		}
 	}
 
 
 	//Fog
-	float x = (1.0f - 30.0f / 0.1f);
-	float y = (30.0f / 0.1f);
+	float x = (1.0f - 10.0f / 0.1f);
+	float y = (10.0f / 0.1f);
 	float linearDepthColor = 1.0f / (x * depthColor + y);
 	if (gFogParameter.enable == true) {
 		float fogWeight = 0.0f;
 		fogWeight += gFogParameter.scale * max(0.0f, 1.0f - exp(-gFogParameter.attenuationRate * linearDepthColor));
-		//fogWeight += gFogParameter.scale * max(0.0f, 1.0f - exp(-gFogParameter.attenuationRate * linearDepthColor));
 		const float3 bgColor = textureColor.rgb;
 		const float3 bgBlurColor = blurColor.rgb;
 		const float3 bgShrinkBlurColor = shrinkBlurColor.rgb;
@@ -102,7 +99,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 		float4 blur2Color = shrinkBlurColor;
 		textureColor = sceneColor * d + blur1Color * blur1Coef + blur2Color * blur2Coef;
 	}
-	
+
 
 	//ビネット
 	if (gVignetteParameter.enable) {
