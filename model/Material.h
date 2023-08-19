@@ -2,21 +2,23 @@
 #include "DirectXCommon.h"
 #include "MathFunction.h"
 
-enum LightingMethod {
-	LambertianReflectance,
-	HalfLambert
-};
-
-struct ConstBufferDataMaterial {
-	Vector4 color;
-	int32_t enableLighting;
-	int32_t lightingMethod;
-	float padding[2];
-	Matrix4x4 uvTransform;
-};
-
 class Material {
 public:
+	//ライティングの種類
+	enum class LightingMethod {
+		LambertianReflectance,
+		HalfLambert
+	};
+
+	//定数バッファ用の構造体
+	struct ConstBufferDataMaterial {
+		Vector4 color;
+		int32_t enableLighting;
+		LightingMethod lightingMethod;
+		float padding[2];
+		Matrix4x4 uvTransform;
+	};
+
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
@@ -49,12 +51,16 @@ private:
 	//書き込み用
 	ConstBufferDataMaterial* materialData_ = nullptr;
 public:
-	//uvTransform
-	Transform uvTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	//uv座標
+	Vector2 translation_{ 0.0f,0.0f };
+	//uv角度
+	float rotation_ = 0.0f;
+	//uvスケール
+	Vector2 scale_{ 1.0f,1.0f };
 	//色
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	//ライティングのフラグ
 	int32_t enableLighting_ = true;
 	//ライティング方式
-	int32_t lightingMethod_ = LambertianReflectance;
+	LightingMethod lightingMethod_ = LightingMethod::HalfLambert;
 };

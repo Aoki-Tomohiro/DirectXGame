@@ -17,11 +17,6 @@ public:
 	static WinApp* GetInstance();
 
 	/// <summary>
-	/// シングルトンインスタンスの削除
-	/// </summary>
-	static void DeleteInstance();
-
-	/// <summary>
 	/// ウィンドウプロシージャ
 	/// </summary>
 	/// <param name="hwnd"></param>

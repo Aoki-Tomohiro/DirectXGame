@@ -2,14 +2,15 @@
 #include "DirectXCommon.h"
 #include "MathFunction.h"
 
-struct ConstBufferDataDirectionalLight {
-	Vector4 color;//ライトの色
-	Vector3 direction;//ライトの向き
-	float intensity;//輝度
-};
-
 class DirectionalLight {
 public:
+	//定数バッファ用の構造体
+	struct ConstBufferDataDirectionalLight {
+		Vector4 color;//ライトの色
+		Vector3 direction;//ライトの向き
+		float intensity;//輝度
+	};
+
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
@@ -21,9 +22,9 @@ public:
 	~DirectionalLight();
 
 	/// <summary>
-	/// 作成
+	/// 初期化
 	/// </summary>
-	void Create();
+	void Initialize();
 
 	/// <summary>
 	/// 更新

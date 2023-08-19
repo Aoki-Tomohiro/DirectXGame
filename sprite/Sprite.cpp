@@ -1,28 +1,25 @@
-#include "Model.h"
-#include <fstream>
-#include <sstream>
+#include "Sprite.h"
 
-Microsoft::WRL::ComPtr<IDxcUtils> Model::sDxcUtils_;
-Microsoft::WRL::ComPtr<IDxcCompiler3> Model::sDxcCompiler_;
-Microsoft::WRL::ComPtr<IDxcIncludeHandler> Model::sIncludeHandler_;
-Microsoft::WRL::ComPtr<ID3D12RootSignature>  Model::sRootSignature_;
-Microsoft::WRL::ComPtr<ID3D12PipelineState>  Model::sPipelineState_;
-ID3D12GraphicsCommandList* Model::sCommandList_;
-std::unique_ptr<DirectionalLight> Model::directionalLight_;
+Microsoft::WRL::ComPtr<IDxcUtils> Sprite::sDxcUtils_;
+Microsoft::WRL::ComPtr<IDxcCompiler3> Sprite::sDxcCompiler_;
+Microsoft::WRL::ComPtr<IDxcIncludeHandler> Sprite::sIncludeHandler_;
+Microsoft::WRL::ComPtr<ID3D12RootSignature>  Sprite::sRootSignature_;
+Microsoft::WRL::ComPtr<ID3D12PipelineState>  Sprite::sPipelineState_;
+ID3D12GraphicsCommandList* Sprite::sCommandList_;
+Matrix4x4 Sprite::sMatProjection_;
 
-void Model::Initialize() {
+void Sprite::Initialize() {
 	//DXCCompilerの初期化
-	Model::InitializeDXCCompiler();
+	Sprite::InitializeDXCCompiler();
 	//パイプラインステートの作成
-	Model::CreatePipelineStateObject();
+	Sprite::CreatePipelineStateObject();
 	//コマンドリストを取得
 	sCommandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
-	//DirectionalLightの作成
-	directionalLight_ = std::make_unique<DirectionalLight>();
-	directionalLight_->Initialize();
+	//平行投影行列の作成
+	sMatProjection_ = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->kClientWidth), float(WinApp::GetInstance()->kClientHeight), 0.0f, 100.0f);
 }
 
-void Model::InitializeDXCCompiler() {
+void Sprite::InitializeDXCCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&sDxcUtils_));
 	assert(SUCCEEDED(hr));
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDxcCompiler_));
@@ -33,11 +30,13 @@ void Model::InitializeDXCCompiler() {
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* profile,
+IDxcBlob* Sprite::CompileShader(const std::wstring& filePath, const wchar_t* profile,
 	IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
+	//WinAppのインスタンスを取得
+	WinApp* winApp = WinApp::GetInstance();
 	//1.hlslファイルを読む
 	//これからシェーダーをコンパイルする旨をログに出す
-	WinApp::GetInstance()->Log(WinApp::GetInstance()->ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	winApp->Log(winApp->ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
@@ -77,7 +76,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		WinApp::GetInstance()->Log(shaderError->GetStringPointer());
+		winApp->Log(shaderError->GetStringPointer());
 		//警告・エラーダメゼッタイ
 		assert(false);
 	}
@@ -89,7 +88,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	//成功したログを出す
-	WinApp::GetInstance()->Log(WinApp::GetInstance()->ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
+	winApp->Log(winApp->ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
 	//もう使わないリソースを解放
 	shaderSource->Release();
 	shaderResult->Release();
@@ -97,7 +96,7 @@ IDxcBlob* Model::CompileShader(const std::wstring& filePath, const wchar_t* prof
 	return shaderBlob;
 }
 
-void Model::CreatePipelineStateObject() {
+void Sprite::CreatePipelineStateObject() {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -108,20 +107,17 @@ void Model::CreatePipelineStateObject() {
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
 	//RootParameter作成。複数設定できるので配列。今回は結果一つだけなので長さ１の配列
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderを使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号０とバインド
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
 	rootParameters[1].Descriptor.ShaderRegister = 0;//レジスタ番号０を使う
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
 	//Sampler
@@ -151,7 +147,7 @@ void Model::CreatePipelineStateObject() {
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -160,10 +156,6 @@ void Model::CreatePipelineStateObject() {
 	inputElementDescs[1].SemanticIndex = 0;
 	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[2].SemanticName = "NORMAL";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -181,11 +173,11 @@ void Model::CreatePipelineStateObject() {
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"shader/Object3d.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"shader/SpriteVS.hlsl",
 		L"vs_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"shader/Object3d.PS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"shader/SpritePS.hlsl",
 		L"ps_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
 
@@ -212,9 +204,8 @@ void Model::CreatePipelineStateObject() {
 	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 2;
+	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	graphicsPipelineStateDesc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
 	//利用するトポロジ(形状)のタイプ。三角形
 	graphicsPipelineStateDesc.PrimitiveTopologyType =
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -226,131 +217,63 @@ void Model::CreatePipelineStateObject() {
 	assert(SUCCEEDED(hr));
 }
 
-Model::Model() {};
+Sprite::Sprite() {};
 
-Model::~Model() {};
+Sprite::~Sprite() {};
 
-void Model::Create(const std::vector<VertexData>& vertices) {
-	//メッシュの作成
-	vertex_ = std::make_unique<Vertex>();
-	vertex_->Create(vertices);
-	//マテリアルの作成
-	material_ = std::make_unique<Material>();
-	material_->Create();
-	//行列の作成
-	transformationMatrix_ = std::make_unique<TransformationMatrix>();
-	transformationMatrix_->Initialize();
+void Sprite::Create(uint32_t textureHandle, Vector2 position) {
+	//テクスチャハンドルを取得
+	textureHandle_ = textureHandle;
+	//リソースの設定を取得
+	resourceDesc_ = TextureManager::GetInstance()->GetResourceDesc(textureHandle_);
+	//リソースの設定からサイズを取得
+	Vector2 size = { float(resourceDesc_.Width), float(resourceDesc_.Height) };
+	//頂点の作成
+	vertices_.push_back(VertexPosUV{ { position.x,position.y + size.y,0.0f,1.0f},{ 0.0f,1.0f } });//左下
+	vertices_.push_back(VertexPosUV{ { position.x,position.y,0.0f,1.0f},{ 0.0f,0.0f } });//左上
+	vertices_.push_back(VertexPosUV{ { position.x + size.x,position.y + size.y,0.0f,1.0f } ,{ 1.0f,1.0f } });//右下
+	vertices_.push_back(VertexPosUV{ { position.x,position.y,0.0f,1.0f},{ 0.0f,0.0f } });//左上
+	vertices_.push_back(VertexPosUV{ { position.x + size.x,position.y,0.0f,1.0f } ,{ 1.0f,0.0f } });//右上
+	vertices_.push_back(VertexPosUV{ { position.x + size.x,position.y + size.y,0.0f,1.0f } ,{ 1.0f,1.0f } });//右下
+	//頂点バッファを作成
+	vertexResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexPosUV) * vertices_.size());
+	//頂点バッファビューを作成
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexPosUV) * vertices_.size());//使用するリソースのサイズは頂点のサイズ
+	vertexBufferView_.StrideInBytes = sizeof(VertexPosUV);
+	//頂点バッファにデータを書き込む
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+	std::memcpy(vertexData_, vertices_.data(), sizeof(VertexPosUV) * vertices_.size());
+	vertexResource_->Unmap(0, nullptr);
+	//WVP用のリソースの作成
+	WVPResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ConstBufferDataWVP));
+	//マテリアル用のリソースの作成
+	MaterialResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ConstBufferDataMaterial));
 }
 
-void Model::CreateFromOBJ(const std::string& directoryPath, const std::string& filename) {
-	//モデルの読み込み
-	modelData_ = Model::LoadObjFile(directoryPath, filename);
-	//メッシュの作成
-	vertex_ = std::make_unique<Vertex>();
-	vertex_->Create(modelData_.vertices);
-	//マテリアルの作成
-	material_ = std::make_unique<Material>();
-	material_->Create();
-	//行列の作成
-	transformationMatrix_ = std::make_unique<TransformationMatrix>();
-	transformationMatrix_->Initialize();
-	//テクスチャの読み込み
-	textureHandle_ = TextureManager::GetInstance()->Load(modelData_.material.textureFilePath);
+void Sprite::Map() {
+	//WVP用のリソースにデータを書き込む
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ scale_.x,scale_.y,1.0f }, { 0.0f,0.0f,rotation_ }, { translation_.x,translation_.y,0.0f });
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, sMatProjection_));
+	WVPResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
+	wvpData_->WVP = worldViewProjectionMatrix;
+	WVPResource_->Unmap(0, nullptr);
+
+	//マテリアル用のリソースにデータを書き込む
+	Transform uvTransform{ {uvScale_.x,uvScale_.y,1.0f},{0.0f,0.0f,uvRotation_},{uvTranslation_.x,uvTranslation_.y,0.0f} };
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
+	MaterialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->color = color_;
+	materialData_->uvTransform = uvTransformMatrix;
+	MaterialResource_->Unmap(0, nullptr);
 }
 
-Model::ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
-	ModelData modelData;//構築するModelData
-	std::vector<Vector4> positions;//位置
-	std::vector<Vector3> normals;//法線
-	std::vector<Vector2> texcoords;//テクスチャ座標
-	std::string line;//ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
-	assert(file.is_open());//とりあえず開けなかったら止める
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;//先頭の識別子を読む
-
-		//identifierに応じた処理
-		if (identifier == "v") {
-			Vector4 position;
-			s >> position.x >> position.y >> position.z;
-			position.z *= -1.0f;
-			position.w = 1.0f;
-			positions.push_back(position);
-		}
-		else if (identifier == "vt") {
-			Vector2 texcoord;
-			s >> texcoord.x >> texcoord.y;
-			texcoord.y = 1.0f - texcoord.y;
-			texcoords.push_back(texcoord);
-		}
-		else if (identifier == "vn") {
-			Vector3 normal;
-			s >> normal.x >> normal.y >> normal.z;
-			normal.z *= -1.0f;
-			normals.push_back(normal);
-		}
-		else if (identifier == "f") {
-			VertexData triangle[3];
-			//面は三角形限定。その他は未対応
-			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-				std::string vertexDefinition;
-				s >> vertexDefinition;
-				//頂点の要素へのIndexは「位置/UV/法線」で格納されているので、分解してIndexを取得する
-				std::istringstream v(vertexDefinition);
-				uint32_t elementIndices[3];
-				for (int32_t element = 0; element < 3; ++element) {
-					std::string index;
-					std::getline(v, index, '/');// /区切りでインデックスを読んでいく
-					elementIndices[element] = std::stoi(index);
-				}
-				//要素へのIndexから、実際の要素の値を取得して、頂点を構築する
-				Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-				Vector3 normal = normals[elementIndices[2] - 1];
-				triangle[faceVertex] = { position,texcoord,normal };
-			}
-			//頂点を逆順で登録することで、回り順を逆にする
-			modelData.vertices.push_back(triangle[2]);
-			modelData.vertices.push_back(triangle[1]);
-			modelData.vertices.push_back(triangle[0]);
-		}
-		else if (identifier == "mtllib") {
-			//materialTempalteLibraryファイルの名前を取得する
-			std::string materialFilename;
-			s >> materialFilename;
-			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
-		}
-	}
-	return modelData;
-}
-
-Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-	MaterialData materialData;//構築するMaterialData
-	std::string line;//ファイルから読んだ1行を格納するもの
-	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
-	assert(file.is_open());//とりあえず開けなかったら止める
-
-	while (std::getline(file, line)) {
-		std::string identifier;
-		std::istringstream s(line);
-		s >> identifier;
-
-		//identifierに応じた処理
-		if (identifier == "map_Kd") {
-			std::string textureFilename;
-			s >> textureFilename;
-			//連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-		}
-	}
-	return materialData;
-}
-
-void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
+void Sprite::Draw() {
+	//マッピングする
+	Sprite::Map();
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	D3D12_VIEWPORT viewport;
 	viewport.Width = float(WinApp::GetInstance()->kClientWidth);
@@ -369,57 +292,20 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	scissorRect.bottom = LONG(WinApp::GetInstance()->kClientHeight);
 	//ScissorRectを設定
 	sCommandList_->RSSetScissorRects(1, &scissorRect);
-	//行列をマッピングする
-	transformationMatrix_->Map(worldTransform, viewProjection);
-	//RootSignatureを設定
+	//ルートシグネチャを設定
 	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
-	//PSOを設定
+	//パイプラインステートを設定
 	sCommandList_->SetPipelineState(sPipelineState_.Get());
-	//transformationMatrixを設定
-	transformationMatrix_->SetGraphicsCommand();
-	//マテリアルを設定
-	material_->SetGraphicsCommand();
+	//VertexBufferViewを設定
+	sCommandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//WVPResourceを設定
+	sCommandList_->SetGraphicsRootConstantBufferView(0, WVPResource_->GetGPUVirtualAddress());
+	//MaterialResourceを設定
+	sCommandList_->SetGraphicsRootConstantBufferView(1, MaterialResource_->GetGPUVirtualAddress());
 	//テクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsCommand(textureHandle_);
-	//directionalLightを設定
-	directionalLight_->SetGraphicsCommand();
+	//形状を設定
+	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画
-	vertex_->Draw();
-}
-
-void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle) {
-	//クライアント領域のサイズと一緒にして画面全体に表示
-	D3D12_VIEWPORT viewport;
-	viewport.Width = float(WinApp::GetInstance()->kClientWidth);
-	viewport.Height = float(WinApp::GetInstance()->kClientHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	//viewportを設定
-	sCommandList_->RSSetViewports(1, &viewport);
-	//基本的にビューポートと同じ矩形が構成されるようにする
-	D3D12_RECT scissorRect;
-	scissorRect.left = 0;
-	scissorRect.right = LONG(WinApp::GetInstance()->kClientWidth);
-	scissorRect.top = 0;
-	scissorRect.bottom = LONG(WinApp::GetInstance()->kClientHeight);
-	//ScissorRectを設定
-	sCommandList_->RSSetScissorRects(1, &scissorRect);
-	//行列をマッピングする
-	transformationMatrix_->Map(worldTransform, viewProjection);
-	//RootSignatureを設定
-	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
-	//PSOを設定
-	sCommandList_->SetPipelineState(sPipelineState_.Get());
-	//transformationMatrixを設定
-	transformationMatrix_->SetGraphicsCommand();
-	//マテリアルを設定
-	material_->SetGraphicsCommand();
-	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsCommand(textureHandle);
-	//directionalLightを設定
-	directionalLight_->SetGraphicsCommand();
-	//描画
-	vertex_->Draw();
+	sCommandList_->DrawInstanced(UINT(vertices_.size()), 1, 0, 0);
 }

@@ -7,21 +7,16 @@ TransformationMatrix::~TransformationMatrix() {};
 void TransformationMatrix::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	//wvpResourceの作成
-	wvpResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(ConstBufferDataTransformationMatrix));
-	//wvpResourceに書き込む
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	wvpData_->WVP = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	wvpData_->World = MakeIdentity4x4();
-	wvpResource_->Unmap(0, nullptr);
+	wvpResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataTransformationMatrix));
 }
 
-void TransformationMatrix::Update() {
-	//ワールドビュープロジェクション行列を作成
-	worldViewProjectionMatrix_ = Multiply(worldMatrix_, Multiply(viewMatrix_, projectionMatrix_));
+void TransformationMatrix::Map(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
+	//ワールドビュープロジェクション行列の計算
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldTransform.matWorld_, Multiply(viewProjection.matView_, viewProjection.matProjection_));
 	//wvpResourceに書き込む
 	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	wvpData_->WVP = worldViewProjectionMatrix_;
-	wvpData_->World = worldMatrix_;
+	wvpData_->WVP = worldViewProjectionMatrix;
+	wvpData_->World = worldTransform.matWorld_;
 	wvpResource_->Unmap(0, nullptr);
 }
 

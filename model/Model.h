@@ -1,25 +1,26 @@
 #pragma once
 #include "DirectXCommon.h"
+#include "TextureManager.h"
 #include "Vertex.h"
 #include "Material.h"
-#include "Texture.h"
 #include "DirectionalLight.h"
 #include "TransformationMatrix.h"
-#include "MathFunction.h"
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-struct MaterialData {
-	std::string textureFilePath;
-};
-
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
-
 class Model {
 public:
+	//マテリアルデータ構造体
+	struct MaterialData {
+		std::string textureFilePath;
+	};
+
+	//モデルデータ構造体
+	struct ModelData {
+		std::vector<VertexData> vertices;
+		MaterialData material;
+	};
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -54,16 +55,6 @@ public:
 	static void CreatePipelineStateObject();
 
 	/// <summary>
-	/// ビューポートの作成
-	/// </summary>
-	static void CreateViewport();
-
-	/// <summary>
-	/// シザーレクトの作成
-	/// </summary>
-	static void CreateScissorRect();
-
-	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	Model();
@@ -76,7 +67,7 @@ public:
 	/// <summary>
 	/// モデルの作成
 	/// </summary>
-	void Create(const std::vector<VertexData>& vertices,Texture* texture);
+	void Create(const std::vector<VertexData>& vertices);
 
 	/// <summary>
 	/// OBJからモデルの作成
@@ -100,9 +91,14 @@ public:
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
+    /// 描画
+    /// </summary>
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
+
+	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(TransformationMatrix* transformationMatrix);
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle);
 
 	/// <summary>
 	/// マテリアルを取得
@@ -117,25 +113,16 @@ public:
 	DirectionalLight* GetDirectionalLight() { return directionalLight_.get(); };
 
 private:
-	//DirectXCommon
-	static DirectXCommon* dxCommon_;
-	//dxcCompiler
-	static IDxcUtils* dxcUtils_;
-	static IDxcCompiler3* dxcCompiler_;
-	static IDxcIncludeHandler* includeHandler_;
-	//RootSignature
-	static ID3DBlob* signatureBlob_;
-	static ID3DBlob* errorBlob_;
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-	//Shaderコンパイル
-	static IDxcBlob* vertexShaderBlob_;
-	static IDxcBlob* pixelShaderBlob_;
-	//PSO
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
-	//ビューポート
-	static D3D12_VIEWPORT viewport_;
-	//シザー矩形
-	static D3D12_RECT scissorRect_;
+	//DXCompiler
+	static Microsoft::WRL::ComPtr<IDxcUtils> sDxcUtils_;
+	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDxcCompiler_;
+	static Microsoft::WRL::ComPtr<IDxcIncludeHandler> sIncludeHandler_;
+	//ルートシグネチャ
+	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature_;
+	//パイプラインステート
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState_;
+	//コマンドリスト
+	static ID3D12GraphicsCommandList* sCommandList_;
 	//ライティング
 	static std::unique_ptr<DirectionalLight> directionalLight_;
 	//モデルデータ
@@ -144,6 +131,8 @@ private:
 	std::unique_ptr<Vertex> vertex_ = nullptr;
 	//マテリアル
 	std::unique_ptr<Material> material_ = nullptr;
-	//テクスチャ
-	std::unique_ptr<Texture> texture_ = nullptr;
+	//行列
+	std::unique_ptr<TransformationMatrix> transformationMatrix_ = nullptr;
+	//テクスチャハンドル
+	uint32_t textureHandle_ = 0;
 };

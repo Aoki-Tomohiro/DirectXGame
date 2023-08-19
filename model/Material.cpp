@@ -7,7 +7,7 @@ Material::~Material() {};
 void Material::Create() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	//マテリアルリソースの作成
-	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(ConstBufferDataMaterial));
+	materialResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataMaterial));
 	//マテリアルリソースに書き込む
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;
@@ -19,9 +19,10 @@ void Material::Create() {
 
 void Material::Update() {
 	//uvTransform
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform_.translate));
+	Transform uvTransform = { {scale_.x,scale_.y,1.0f},{0.0f,0.0f,rotation_},{translation_.x,translation_.y,0.0f} };
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
 	//マテリアルリソースに書き込む
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;

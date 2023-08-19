@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)math;$(ProjectDir)base;$(ProjectDir)model;$(ProjectDir)texture;$(ProjectDir)transformationmatrix;$(ProjectDir)imguimanager;$(ProjectDir)postprocess;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)base;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)math;$(ProjectDir)model;$(ProjectDir)scene;$(ProjectDir)sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)math;$(ProjectDir)base;$(ProjectDir)model;$(ProjectDir)texture;$(ProjectDir)transformationmatrix;$(ProjectDir)imguimanager;$(ProjectDir)postprocess;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)base;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)math;$(ProjectDir)model;$(ProjectDir)scene;$(ProjectDir)sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -91,6 +91,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base\DirectXCommon.cpp" />
+    <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
@@ -99,28 +100,25 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="imguimanager\ImGuiManager.cpp" />
+    <ClCompile Include="ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\MathFunction.cpp" />
     <ClCompile Include="model\DirectionalLight.cpp" />
     <ClCompile Include="model\Material.cpp" />
     <ClCompile Include="model\Model.cpp" />
     <ClCompile Include="model\Vertex.cpp" />
-    <ClCompile Include="postprocess\Dof.cpp" />
-    <ClCompile Include="postprocess\Fog.cpp" />
-    <ClCompile Include="postprocess\GaussianBlur.cpp" />
-    <ClCompile Include="postprocess\LensDistortion.cpp" />
-    <ClCompile Include="postprocess\PostProcess.cpp" />
-    <ClCompile Include="postprocess\Vignette.cpp" />
     <ClCompile Include="scene\GameManager.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\TitleScene.cpp" />
-    <ClCompile Include="texture\Texture.cpp" />
-    <ClCompile Include="transformationmatrix\TransformationMatrix.cpp" />
+    <ClCompile Include="sprite\Sprite.cpp" />
+    <ClCompile Include="TransformationMatrix\TransformationMatrix.cpp" />
+    <ClCompile Include="TransformationMatrix\ViewProjection.cpp" />
+    <ClCompile Include="TransformationMatrix\WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\D3DResourceLeakChecker.h" />
     <ClInclude Include="base\DirectXCommon.h" />
+    <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -130,24 +128,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="imguimanager\ImGuiManager.h" />
+    <ClInclude Include="ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="math\MathFunction.h" />
     <ClInclude Include="model\DirectionalLight.h" />
     <ClInclude Include="model\Material.h" />
     <ClInclude Include="model\Model.h" />
     <ClInclude Include="model\Vertex.h" />
-    <ClInclude Include="postprocess\Dof.h" />
-    <ClInclude Include="postprocess\Fog.h" />
-    <ClInclude Include="postprocess\GaussianBlur.h" />
-    <ClInclude Include="postprocess\LensDistortion.h" />
-    <ClInclude Include="postprocess\PostProcess.h" />
-    <ClInclude Include="postprocess\Vignette.h" />
     <ClInclude Include="scene\GameManager.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\TitleScene.h" />
-    <ClInclude Include="texture\Texture.h" />
-    <ClInclude Include="transformationmatrix\TransformationMatrix.h" />
+    <ClInclude Include="sprite\Sprite.h" />
+    <ClInclude Include="TransformationMatrix\TransformationMatrix.h" />
+    <ClInclude Include="TransformationMatrix\ViewProjection.h" />
+    <ClInclude Include="TransformationMatrix\WorldTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -158,23 +152,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\Blur.hlsli" />
-    <None Include="shader\Object3d.hlsli" />
-    <None Include="shader\SecondPass.hlsli" />
+    <None Include="shader\Object3d.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="shader\Sprite.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shader\BlurVS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shader\HorizontalBlurPS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shader\HorizontalShrinkBlurPS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="shader\Object3d.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -183,19 +170,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="shader\SecondPassPS.hlsl">
+    <FxCompile Include="shader\SpritePS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="shader\SecondPassVS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shader\VerticalBlurPS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shader\VerticalShrinkBlurPS.hlsl">
+    <FxCompile Include="shader\SpriteVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

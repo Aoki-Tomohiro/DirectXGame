@@ -4,10 +4,10 @@ DirectionalLight::DirectionalLight() {};
 
 DirectionalLight::~DirectionalLight() {};
 
-void DirectionalLight::Create() {
+void DirectionalLight::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	//lightingResourceの作成
-	lightingResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(ConstBufferDataDirectionalLight));
+	lightingResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataDirectionalLight));
 	//lightingResourceに書き込む
 	lightingResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
 	directionalLightData_->color = color_;

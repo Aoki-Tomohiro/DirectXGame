@@ -1,12 +1,22 @@
-#include "Texture.h"
+#include "TextureManager.h"
+#include <cassert>
 
-Texture::Texture() {
-	dxCommon_ = DirectXCommon::GetInstance();
+TextureManager* TextureManager::instance;
+
+TextureManager* TextureManager::GetInstance() {
+	if (instance == nullptr) {
+		instance = new TextureManager();
+	}
+	return instance;
 }
 
-Texture::~Texture() {};
+void TextureManager::Initialize() {
+	dxCommon_ = DirectXCommon::GetInstance();
+	srvDescriptorHeap_ = dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNumDescriptors, true);
+}
 
-uint32_t Texture::Load(const std::string& filePath) {
+uint32_t TextureManager::Load(const std::string& filePath) {
+	srvIndex_++;
 	//テクスチャファイルを読んでプログラムを扱えるようにする
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = dxCommon_->GetWinApp()->ConvertString(filePath);
@@ -19,18 +29,17 @@ uint32_t Texture::Load(const std::string& filePath) {
 
 	//テクスチャリソースの作成
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResource_ = CreateTextureResource(metadata);
-
+	textures_[srvIndex_].resource = TextureManager::CreateTextureResource(metadata);
 	//テクスチャをアップロード
-	intermediateResource_ = UploadTextureData(textureResource_, mipImages);
+	textures_[srvIndex_].intermediateResource = TextureManager::UploadTextureData(textures_[srvIndex_].resource, mipImages);
 
-	//シェーダリソースビューの作成
-	srvIndex_ = dxCommon_->CreateShaderResourceView(textureResource_, metadata);
+	//SRVの作成
+	TextureManager::CreateShaderResourceView(textures_[srvIndex_].resource, metadata);
 
 	return srvIndex_;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> Texture::CreateTextureResource(const DirectX::TexMetadata& metadata) {
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(const DirectX::TexMetadata& metadata) {
 	//metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);//Textureの幅
@@ -61,11 +70,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Texture::CreateTextureResource(const Dire
 }
 
 [[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> Texture::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages) {
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages) {
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 	DirectX::PrepareUpload(dxCommon_->GetDevice().Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), intermediateSize);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(intermediateSize);
 	UpdateSubresources(dxCommon_->GetCommandList().Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
 	//Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
@@ -79,10 +88,30 @@ Microsoft::WRL::ComPtr<ID3D12Resource> Texture::UploadTextureData(const Microsof
 	return intermediateResource;
 }
 
-void Texture::SetGraphicsCommand() {
-	//GPUハンドルを取得
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle;
-	srvHandle = dxCommon_->GetGPUDescriptorHandle(dxCommon_->GetSRVDescriptorHeap(), dxCommon_->descriptorSizeSRV, srvIndex_);
-	//テクスチャをセット
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvHandle);
+void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata) {
+	//metadataを基にSRVを設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	//SRVを作成するDescriptorHeapの場所を決める
+	textures_[srvIndex_].cpuHandleSRV = dxCommon_->GetCPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	textures_[srvIndex_].gpuHandleSRV = dxCommon_->GetGPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	//SRVを作成
+	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
+}
+
+void TextureManager::SetGraphicsCommand(uint32_t textureHandle) {
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
+	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textures_[textureHandle].gpuHandleSRV);
+}
+
+const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {
+	//リソース情報の取得
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc = textures_[textureHandle].resource->GetDesc();
+	return resourceDesc;
 }

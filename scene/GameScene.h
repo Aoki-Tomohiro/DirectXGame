@@ -1,10 +1,12 @@
 #pragma once
 #include "IScene.h"
 #include "DirectXCommon.h"
+#include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "WorldTransform.h"
+#include "ViewProjection.h"
 #include "Model.h"
-#include "Texture.h"
-#include "TransformationMatrix.h"
+#include "Sprite.h"
 
 class GameScene : public IScene {
 public:
@@ -35,31 +37,23 @@ public:
 
 private:
 	DirectXCommon* dxCommon_ = nullptr;
+	TextureManager* textureManager_ = nullptr;
 	ImGuiManager* imguiManager_ = nullptr;
-	//テクスチャ
-	std::unique_ptr<Texture> texture_ = nullptr;
-	//三角形
-	std::vector<VertexData> triangle_;
-	std::unique_ptr<Model> model_ = nullptr;
-	std::unique_ptr<TransformationMatrix> transformationMatrix_ = nullptr;
-	//球
-	std::vector<VertexData> sphere_;
-	std::unique_ptr<Model> modelSphere_ = nullptr;
-	std::unique_ptr<TransformationMatrix> transformationMatrixSphere_ = nullptr;
+	//画像
+	uint32_t textureHandle_ = 0;
 	//スプライト
-	std::vector<VertexData> sprite_;
-	std::unique_ptr<Model> modelSprite_ = nullptr;
-	std::unique_ptr<TransformationMatrix> transformationMatrixSprite_ = nullptr;
-	//utahTeapot
-	std::unique_ptr<Model> modelUtahTeapot_ = nullptr;
-	std::unique_ptr<TransformationMatrix> transformationMatrixUtahTeapot_ = nullptr;
-	//StanfordBunny
-	std::unique_ptr<Model> modelStanfordBunny_ = nullptr;
-	std::unique_ptr<TransformationMatrix> transformationMatrixStanfordBunny_ = nullptr;
-	//imgui用
-	bool drawTriangle_ = true;
-	bool drawSphere_ = false;
-	bool drawSprite_ = false;
-	bool drawUtahTeapot_ = false;
-	bool drawStanfordBunny_ = false;
+	std::unique_ptr<Sprite> sprite_ = nullptr;
+	Vector2 translation_{ 0.0f,0.0f };
+	Vector2 scale_{ 1.0f,1.0f };
+	float rotation_ = 0.0f;
+	Vector4 color_{ 1.0f,1.0f,1.0f,1.0f };
+	Vector2 uvTranslation_{ 0.0f,0.0f };
+	float uvRotation_ = 0.0f;
+	Vector2 uvScale_{ 1.0f,1.0f };
+	//モデル
+	std::unique_ptr<Model> modelPlane_ = nullptr;
+	//ワールドトランスフォーム
+	WorldTransform worldTransformPlane_{};
+	//ビュープロジェクション
+	ViewProjection viewProjection_{};
 };
