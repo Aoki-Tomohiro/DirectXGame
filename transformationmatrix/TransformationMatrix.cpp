@@ -20,7 +20,7 @@ void TransformationMatrix::Map(const WorldTransform& worldTransform, const ViewP
 	wvpResource_->Unmap(0, nullptr);
 }
 
-void TransformationMatrix::SetGraphicsCommand() {
+void TransformationMatrix::SetGraphicsCommand(UINT rootParameterIndex) {
 	//wvpResourceの場所を設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, wvpResource_->GetGPUVirtualAddress());
 }

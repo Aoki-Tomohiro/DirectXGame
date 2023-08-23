@@ -1,13 +1,18 @@
 #include "TextureManager.h"
 #include <cassert>
 
-TextureManager* TextureManager::instance;
+TextureManager* TextureManager::instance = nullptr;
 
 TextureManager* TextureManager::GetInstance() {
 	if (instance == nullptr) {
 		instance = new TextureManager();
 	}
 	return instance;
+}
+
+void TextureManager::DeleteInstance() {
+	delete instance;
+	instance = nullptr;
 }
 
 void TextureManager::Initialize() {
@@ -103,10 +108,10 @@ void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D1
 	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
 }
 
-void TextureManager::SetGraphicsCommand(uint32_t textureHandle) {
+void TextureManager::SetGraphicsCommand(UINT rootParameterIndex, uint32_t textureHandle) {
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textures_[textureHandle].gpuHandleSRV);
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].gpuHandleSRV);
 }
 
 const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {

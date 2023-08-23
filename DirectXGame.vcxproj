@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)base;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)math;$(ProjectDir)model;$(ProjectDir)scene;$(ProjectDir)sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)base;$(ProjectDir)externals/DirectXTex;$(ProjectDir)externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)math;$(ProjectDir)model;$(ProjectDir)scene;$(ProjectDir)sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -90,9 +90,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="CollisionManager\CollisionManager.cpp" />
+    <ClCompile Include="DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -101,6 +104,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ImGuiManager\ImGuiManager.cpp" />
+    <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\MathFunction.cpp" />
     <ClCompile Include="model\DirectionalLight.cpp" />
@@ -110,16 +114,21 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="scene\GameManager.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\TitleScene.cpp" />
-    <ClCompile Include="sprite\Sprite.cpp" />
+    <ClCompile Include="Sprite\Sprite.cpp" />
     <ClCompile Include="TransformationMatrix\TransformationMatrix.cpp" />
     <ClCompile Include="TransformationMatrix\ViewProjection.cpp" />
     <ClCompile Include="TransformationMatrix\WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="base\D3DResourceLeakChecker.h" />
     <ClInclude Include="base\DirectXCommon.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="CollisionManager\Collider.h" />
+    <ClInclude Include="CollisionManager\CollisionConfig.h" />
+    <ClInclude Include="CollisionManager\CollisionManager.h" />
+    <ClInclude Include="DebugCamera\DebugCamera.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -129,6 +138,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="ImGuiManager\ImGuiManager.h" />
+    <ClInclude Include="Input\Input.h" />
     <ClInclude Include="math\MathFunction.h" />
     <ClInclude Include="model\DirectionalLight.h" />
     <ClInclude Include="model\Material.h" />
@@ -138,7 +148,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\TitleScene.h" />
-    <ClInclude Include="sprite\Sprite.h" />
+    <ClInclude Include="Sprite\Sprite.h" />
     <ClInclude Include="TransformationMatrix\TransformationMatrix.h" />
     <ClInclude Include="TransformationMatrix\ViewProjection.h" />
     <ClInclude Include="TransformationMatrix\WorldTransform.h" />

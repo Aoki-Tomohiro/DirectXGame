@@ -1,16 +1,16 @@
 #include "Sprite.h"
 
-Microsoft::WRL::ComPtr<IDxcUtils> Sprite::sDxcUtils_;
-Microsoft::WRL::ComPtr<IDxcCompiler3> Sprite::sDxcCompiler_;
-Microsoft::WRL::ComPtr<IDxcIncludeHandler> Sprite::sIncludeHandler_;
-Microsoft::WRL::ComPtr<ID3D12RootSignature>  Sprite::sRootSignature_;
-Microsoft::WRL::ComPtr<ID3D12PipelineState>  Sprite::sPipelineState_;
-ID3D12GraphicsCommandList* Sprite::sCommandList_;
-Matrix4x4 Sprite::sMatProjection_;
+Microsoft::WRL::ComPtr<IDxcUtils> Sprite::sDxcUtils_ = nullptr;
+Microsoft::WRL::ComPtr<IDxcCompiler3> Sprite::sDXCompiler_ = nullptr;
+Microsoft::WRL::ComPtr<IDxcIncludeHandler> Sprite::sIncludeHandler_ = nullptr;
+Microsoft::WRL::ComPtr<ID3D12RootSignature>  Sprite::sRootSignature_ = nullptr;
+Microsoft::WRL::ComPtr<ID3D12PipelineState>  Sprite::sPipelineState_ = nullptr;
+ID3D12GraphicsCommandList* Sprite::sCommandList_ = nullptr;
+Matrix4x4 Sprite::sMatProjection_{};
 
 void Sprite::Initialize() {
 	//DXCCompilerの初期化
-	Sprite::InitializeDXCCompiler();
+	Sprite::InitializeDXCompiler();
 	//パイプラインステートの作成
 	Sprite::CreatePipelineStateObject();
 	//コマンドリストを取得
@@ -19,10 +19,19 @@ void Sprite::Initialize() {
 	sMatProjection_ = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->kClientWidth), float(WinApp::GetInstance()->kClientHeight), 0.0f, 100.0f);
 }
 
-void Sprite::InitializeDXCCompiler() {
+void Sprite::Delete() {
+	if (sPipelineState_ != nullptr) {
+		sPipelineState_.~ComPtr();
+	}
+	if (sRootSignature_ != nullptr) {
+		sRootSignature_.~ComPtr();
+	}
+}
+
+void Sprite::InitializeDXCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&sDxcUtils_));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDxcCompiler_));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDXCompiler_));
 	assert(SUCCEEDED(hr));
 
 	//現時点でincludeはしないが、includeに対応するための設定を行っていく
@@ -143,7 +152,7 @@ void Sprite::CreatePipelineStateObject() {
 	}
 	//バイナリを元に生成
 	hr = DirectXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&sRootSignature_));
+		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&Sprite::sRootSignature_));
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
@@ -174,11 +183,11 @@ void Sprite::CreatePipelineStateObject() {
 
 	//Shaderをコンパイルする
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"shader/SpriteVS.hlsl",
-		L"vs_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
+		L"vs_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"shader/SpritePS.hlsl",
-		L"ps_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
+		L"ps_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	//DepthStencilStateの設定
@@ -299,11 +308,11 @@ void Sprite::Draw() {
 	//VertexBufferViewを設定
 	sCommandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//WVPResourceを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(0, WVPResource_->GetGPUVirtualAddress());
+	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::TransformationMatrix), WVPResource_->GetGPUVirtualAddress());
 	//MaterialResourceを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(1, MaterialResource_->GetGPUVirtualAddress());
+	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::Material), MaterialResource_->GetGPUVirtualAddress());
 	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsCommand(textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsCommand(UINT(RootParameterIndex::Texture), textureHandle_);
 	//形状を設定
 	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画

@@ -1,9 +1,11 @@
 #pragma once
+#include "D3DResourceLeakChecker.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
 #include "TextureManager.h"
 #include "ImGuiManager.h"
-#include "D3DResourceLeakChecker.h"
+#include "Audio.h"
+#include "Input.h"
 #include "IScene.h"
 #include <memory>
 
@@ -29,7 +31,7 @@ public:
 	/// ゲームループ
 	/// </summary>
 	/// <returns></returns>
-	int run();
+	void run();
 
 private:
 	D3DResourceLeakChecker leakCheck;
@@ -37,5 +39,7 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
 	ImGuiManager* imguiManager_ = nullptr;
+	Audio* audio_ = nullptr;
+	Input* input_ = nullptr;
 	IScene* nowScene_;
 };

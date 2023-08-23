@@ -2,9 +2,18 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
 
+ImGuiManager* ImGuiManager::instance;
+
 ImGuiManager* ImGuiManager::GetInstance() {
-	static ImGuiManager instance;
-	return &instance;
+	if (instance == nullptr) {
+		instance = new ImGuiManager();
+	}
+	return instance;
+}
+
+void ImGuiManager::DeleteInstance() {
+	delete instance;
+	instance = nullptr;
 }
 
 void ImGuiManager::Initialize() {

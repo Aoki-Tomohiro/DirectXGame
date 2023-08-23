@@ -10,6 +10,14 @@
 
 class Model {
 public:
+	//ルートパラメーターの番号
+	enum class RootParameterIndex {
+		Material,
+		TransformationMatrix,
+		Texture,
+		DirectionalLight
+	};
+
 	//マテリアルデータ構造体
 	struct MaterialData {
 		std::string textureFilePath;
@@ -27,9 +35,14 @@ public:
 	static void Initialize();
 
 	/// <summary>
-	/// DXCCompilerの初期化
+	/// 解放処理
 	/// </summary>
-	static void InitializeDXCCompiler();
+	static void Delete();
+
+	/// <summary>
+	/// DXCompilerの初期化
+	/// </summary>
+	static void InitializeDXCompiler();
 
 	/// <summary>
 	/// シェーダーの読み込み
@@ -110,12 +123,12 @@ public:
 	/// directionalLightを取得
 	/// </summary>
 	/// <returns></returns>
-	DirectionalLight* GetDirectionalLight() { return directionalLight_.get(); };
+	DirectionalLight* GetDirectionalLight() { return sDirectionalLight_.get(); };
 
 private:
 	//DXCompiler
 	static Microsoft::WRL::ComPtr<IDxcUtils> sDxcUtils_;
-	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDxcCompiler_;
+	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDXCompiler_;
 	static Microsoft::WRL::ComPtr<IDxcIncludeHandler> sIncludeHandler_;
 	//ルートシグネチャ
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature_;
@@ -124,7 +137,7 @@ private:
 	//コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList_;
 	//ライティング
-	static std::unique_ptr<DirectionalLight> directionalLight_;
+	static std::unique_ptr<DirectionalLight> sDirectionalLight_;
 	//モデルデータ
 	ModelData modelData_;
 	//メッシュ

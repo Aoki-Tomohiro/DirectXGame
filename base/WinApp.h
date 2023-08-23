@@ -17,6 +17,11 @@ public:
 	static WinApp* GetInstance();
 
 	/// <summary>
+	/// シングルトンインスタンスの削除
+	/// </summary>
+	static void DeleteInstance();
+
+	/// <summary>
 	/// ウィンドウプロシージャ
 	/// </summary>
 	/// <param name="hwnd"></param>
@@ -70,6 +75,13 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	HWND GetHwnd() { return hwnd_; };
+
+	/// <summary>
+	/// インスタンスハンドルの取得
+	/// </summary>
+	/// <returns></returns>
+	HINSTANCE GetHInstance() { return wc_.hInstance; };
+
 private:
 	WinApp() = default;
 	~WinApp() = default;

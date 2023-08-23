@@ -25,7 +25,7 @@ void DirectionalLight::Update() {
 	lightingResource_->Unmap(0, nullptr);
 }
 
-void DirectionalLight::SetGraphicsCommand() {
+void DirectionalLight::SetGraphicsCommand(UINT rootParameterIndex) {
 	//lightingResourceの場所を設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightingResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, lightingResource_->GetGPUVirtualAddress());
 }

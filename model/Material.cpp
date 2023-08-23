@@ -32,7 +32,7 @@ void Material::Update() {
 	materialResource_->Unmap(0, nullptr);
 }
 
-void Material::SetGraphicsCommand() {
+void Material::SetGraphicsCommand(UINT rootParameterIndex) {
 	//マテリアルリソースの場所を設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, materialResource_->GetGPUVirtualAddress());
 }

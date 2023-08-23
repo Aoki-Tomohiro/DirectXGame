@@ -1,7 +1,7 @@
 #include "DirectXCommon.h"
 #include "TextureManager.h"
 
-DirectXCommon* DirectXCommon::instance;
+DirectXCommon* DirectXCommon::instance = nullptr;
 uint32_t DirectXCommon::descriptorSizeSRV;
 uint32_t DirectXCommon::descriptorSizeRTV;
 uint32_t DirectXCommon::descriptorSizeDSV;
@@ -11,6 +11,11 @@ DirectXCommon* DirectXCommon::GetInstance() {
 		instance = new DirectXCommon();
 	}
 	return instance;
+}
+
+void DirectXCommon::DeleteInstance() {
+	delete instance;
+	instance = nullptr;
 }
 
 void DirectXCommon::Initialize() {

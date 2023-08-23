@@ -20,6 +20,11 @@ public:
 	static TextureManager* GetInstance();
 
 	/// <summary>
+	/// シングルトンインスタンスの削除
+	/// </summary>
+	static void DeleteInstance();
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize();
@@ -53,7 +58,7 @@ public:
 	/// デスクリプタテーブルをセット
 	/// </summary>
 	/// <param name="textureHandle"></param>
-	void SetGraphicsCommand(uint32_t textureHandle);
+	void SetGraphicsCommand(UINT rootParameterIndex, uint32_t textureHandle);
 
 	/// <summary>
 	/// リソース情報を取得

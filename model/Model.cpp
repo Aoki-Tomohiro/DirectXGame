@@ -2,30 +2,42 @@
 #include <fstream>
 #include <sstream>
 
-Microsoft::WRL::ComPtr<IDxcUtils> Model::sDxcUtils_;
-Microsoft::WRL::ComPtr<IDxcCompiler3> Model::sDxcCompiler_;
-Microsoft::WRL::ComPtr<IDxcIncludeHandler> Model::sIncludeHandler_;
-Microsoft::WRL::ComPtr<ID3D12RootSignature>  Model::sRootSignature_;
-Microsoft::WRL::ComPtr<ID3D12PipelineState>  Model::sPipelineState_;
-ID3D12GraphicsCommandList* Model::sCommandList_;
-std::unique_ptr<DirectionalLight> Model::directionalLight_;
+Microsoft::WRL::ComPtr<IDxcUtils> Model::sDxcUtils_ = nullptr;
+Microsoft::WRL::ComPtr<IDxcCompiler3> Model::sDXCompiler_ = nullptr;
+Microsoft::WRL::ComPtr<IDxcIncludeHandler> Model::sIncludeHandler_ = nullptr;
+Microsoft::WRL::ComPtr<ID3D12RootSignature>  Model::sRootSignature_ = nullptr;
+Microsoft::WRL::ComPtr<ID3D12PipelineState>  Model::sPipelineState_ = nullptr;
+ID3D12GraphicsCommandList* Model::sCommandList_ = nullptr;
+std::unique_ptr<DirectionalLight> Model::sDirectionalLight_ = nullptr;
 
 void Model::Initialize() {
 	//DXCCompilerの初期化
-	Model::InitializeDXCCompiler();
+	Model::InitializeDXCompiler();
 	//パイプラインステートの作成
 	Model::CreatePipelineStateObject();
 	//コマンドリストを取得
 	sCommandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
 	//DirectionalLightの作成
-	directionalLight_ = std::make_unique<DirectionalLight>();
-	directionalLight_->Initialize();
+	sDirectionalLight_ = std::make_unique<DirectionalLight>();
+	sDirectionalLight_->Initialize();
 }
 
-void Model::InitializeDXCCompiler() {
+void Model::Delete() {
+	if (sDirectionalLight_ != nullptr) {
+		sDirectionalLight_->~DirectionalLight();
+	}
+	if (sPipelineState_ != nullptr) {
+		sPipelineState_.~ComPtr();
+	}
+	if (sRootSignature_ != nullptr) {
+		sRootSignature_.~ComPtr();
+	}
+}
+
+void Model::InitializeDXCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&sDxcUtils_));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDxcCompiler_));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDXCompiler_));
 	assert(SUCCEEDED(hr));
 
 	//現時点でincludeはしないが、includeに対応するための設定を行っていく
@@ -182,11 +194,11 @@ void Model::CreatePipelineStateObject() {
 
 	//Shaderをコンパイルする
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"shader/Object3d.VS.hlsl",
-		L"vs_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
+		L"vs_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"shader/Object3d.PS.hlsl",
-		L"ps_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
+		L"ps_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	//DepthStencilStateの設定
@@ -375,14 +387,14 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
 	//PSOを設定
 	sCommandList_->SetPipelineState(sPipelineState_.Get());
-	//transformationMatrixを設定
-	transformationMatrix_->SetGraphicsCommand();
 	//マテリアルを設定
-	material_->SetGraphicsCommand();
+	material_->SetGraphicsCommand(UINT(RootParameterIndex::Material));
+	//transformationMatrixを設定
+	transformationMatrix_->SetGraphicsCommand(UINT(RootParameterIndex::TransformationMatrix));
 	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsCommand(textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsCommand(UINT(RootParameterIndex::Texture), textureHandle_);
 	//directionalLightを設定
-	directionalLight_->SetGraphicsCommand();
+	sDirectionalLight_->SetGraphicsCommand(UINT(RootParameterIndex::DirectionalLight));
 	//描画
 	vertex_->Draw();
 }
@@ -412,14 +424,14 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
 	//PSOを設定
 	sCommandList_->SetPipelineState(sPipelineState_.Get());
-	//transformationMatrixを設定
-	transformationMatrix_->SetGraphicsCommand();
 	//マテリアルを設定
-	material_->SetGraphicsCommand();
+	material_->SetGraphicsCommand(UINT(RootParameterIndex::Material));
+	//transformationMatrixを設定
+	transformationMatrix_->SetGraphicsCommand(UINT(RootParameterIndex::TransformationMatrix));
 	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsCommand(textureHandle);
+	TextureManager::GetInstance()->SetGraphicsCommand(UINT(RootParameterIndex::Texture), textureHandle);
 	//directionalLightを設定
-	directionalLight_->SetGraphicsCommand();
+	sDirectionalLight_->SetGraphicsCommand(UINT(RootParameterIndex::DirectionalLight));
 	//描画
 	vertex_->Draw();
 }

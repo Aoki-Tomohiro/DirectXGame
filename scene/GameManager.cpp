@@ -16,17 +16,32 @@ GameManager::GameManager() {
 	//ImGuiの初期化
 	imguiManager_ = ImGuiManager::GetInstance();
 	imguiManager_->Initialize();
-	//シーンの初期化
-	nowScene_ = new GameScene();
-	nowScene_->Initialize(this);
+	//Audioの初期化
+	audio_ = Audio::GetInstance();
+	audio_->Initialize();
+	//Inputの初期化
+	input_ = Input::GetInstance();
+	input_->Initialize();
 	//モデルの初期化
 	Model::Initialize();
 	//スプライトの初期化
 	Sprite::Initialize();
+	//シーンの初期化
+	nowScene_ = new GameScene();
+	nowScene_->Initialize(this);
 }
 
 GameManager::~GameManager() {
 	delete nowScene_;
+	nowScene_ = nullptr;
+	Sprite::Delete();
+	Model::Delete();
+	Input::DeleteInstance();
+	Audio::DeleteInstance();
+	ImGuiManager::DeleteInstance();
+	TextureManager::DeleteInstance();
+	DirectXCommon::DeleteInstance();
+	WinApp::DeleteInstance();
 }
 
 void GameManager::ChangeScene(IScene* newScene) {
@@ -35,7 +50,7 @@ void GameManager::ChangeScene(IScene* newScene) {
 	nowScene_->Initialize(this);
 }
 
-int GameManager::run() {
+void GameManager::run() {
 	while (true) {
 		//メインループを抜ける
 		if (winApp_->MessageRoop()) {
@@ -44,6 +59,8 @@ int GameManager::run() {
 
 		//ImGui受付開始
 		imguiManager_->Begin();
+		//Inputの更新
+		input_->Update();
 		//ゲームシーンの更新
 		nowScene_->Update(this);
 		//ImGui受付終了
@@ -60,7 +77,8 @@ int GameManager::run() {
 	}
 	//ImGuiの解放処理
 	imguiManager_->ShutDown();
+	//Audioの解放処理
+	audio_->Finalize();
 	//ゲームウィンドウ削除
 	winApp_->CloseGameWindow();
-	return 0;
 }

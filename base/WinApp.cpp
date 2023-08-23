@@ -3,13 +3,18 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-WinApp* WinApp::instance;
+WinApp* WinApp::instance = nullptr;
 
 WinApp* WinApp::GetInstance() {
 	if (instance == nullptr) {
 		instance = new WinApp();
 	}
 	return instance;
+}
+
+void WinApp::DeleteInstance() {
+	delete instance;
+	instance = nullptr;
 }
 
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {

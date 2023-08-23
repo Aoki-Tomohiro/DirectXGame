@@ -1,12 +1,11 @@
 #include "Vertex.h"
 
-Vertex::Vertex() {
-	dxCommon_ = DirectXCommon::GetInstance();
-}
+Vertex::Vertex() {}
 
 Vertex::~Vertex() {};
 
 void Vertex::Create(const std::vector<VertexData>& vertices) {
+	dxCommon_ = DirectXCommon::GetInstance();
 	//頂点情報を取得
 	vertices_ = vertices;
 	//頂点バッファを作成

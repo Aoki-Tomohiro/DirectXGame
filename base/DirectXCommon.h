@@ -26,6 +26,11 @@ public:
 	static DirectXCommon* GetInstance();
 
 	/// <summary>
+	/// シングルトンインスタンスの削除
+	/// </summary>
+	static void DeleteInstance();
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize();

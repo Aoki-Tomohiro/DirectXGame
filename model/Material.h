@@ -42,7 +42,7 @@ public:
 	/// <summary>
 	/// グラフィックスコマンドのセット
 	/// </summary>
-	void SetGraphicsCommand();
+	void SetGraphicsCommand(UINT rootParameterIndex);
 
 private:
 	DirectXCommon* dxCommon_ = nullptr;

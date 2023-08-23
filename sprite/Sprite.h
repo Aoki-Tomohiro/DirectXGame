@@ -7,6 +7,12 @@
 
 class Sprite{
 public:
+	enum class RootParameterIndex {
+		TransformationMatrix,
+		Material,
+		Texture
+	};
+
 	struct VertexPosUV {
 		Vector4 pos;
 		Vector2 texcoord;
@@ -27,9 +33,14 @@ public:
 	static void Initialize();
 
 	/// <summary>
-    /// DXCCompilerの初期化
+	/// 解放処理
+	/// </summary>
+	static void Delete();
+
+	/// <summary>
+    /// DXCompilerの初期化
     /// </summary>
-	static void InitializeDXCCompiler();
+	static void InitializeDXCompiler();
 
 	/// <summary>
 	/// シェーダーの読み込み
@@ -168,7 +179,7 @@ public:
 private:
 	//DXCompiler
 	static Microsoft::WRL::ComPtr<IDxcUtils> sDxcUtils_;
-	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDxcCompiler_;
+	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDXCompiler_;
 	static Microsoft::WRL::ComPtr<IDxcIncludeHandler> sIncludeHandler_;
 	//ルートシグネチャ
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature_;

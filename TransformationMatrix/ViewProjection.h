@@ -5,9 +5,7 @@ struct ViewProjection {
 	//回転
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	//座標
-	Vector3 translation_ = { 0.0f,0.0f,-10.0f };
-	//ワールド行列
-	Matrix4x4 matWorld_{};
+	Vector3 translation_ = { 0.0f,0.0f,-50.0f };
 	//ビュー行列
 	Matrix4x4 matView_{};
 	//プロジェクション行列

@@ -22,44 +22,68 @@
     <Filter Include="ソース ファイル\ImGuiManager">
       <UniqueIdentifier>{78ede397-19a2-4bd9-b852-89b8cbc82b91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\math">
-      <UniqueIdentifier>{dba95ec4-7b26-4cd4-b620-da7507bb3c63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\model">
-      <UniqueIdentifier>{583eb888-33b2-41b1-9df5-bdec3c60481d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\scene">
-      <UniqueIdentifier>{12d57838-33a1-49b7-b22d-3fee260c9c11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\sprite">
-      <UniqueIdentifier>{1954b6d5-ed02-4a09-a2ef-f11e253e2c49}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\ImGuiManager">
       <UniqueIdentifier>{ed1d45eb-d48e-45c3-a02c-6764c81c3b19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\math">
-      <UniqueIdentifier>{3a60b5c0-499a-4262-991d-8bb24bd4ffea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\model">
-      <UniqueIdentifier>{18f538e6-1d91-4467-8964-4d55d181ab07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\scene">
-      <UniqueIdentifier>{56fdece2-10d2-4c39-83d7-7762e6e3066a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\TransformationMatrix">
       <UniqueIdentifier>{1e229100-034f-43ac-8af4-6c5c2086b800}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\sprite">
-      <UniqueIdentifier>{0bb1f938-2d22-4878-b967-434278ca748c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\TransformationMatrix">
       <UniqueIdentifier>{c9bfd463-0898-485a-951c-fab680155190}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\base">
+    <Filter Include="ソース ファイル\DebugCamera">
+      <UniqueIdentifier>{4a08963b-a729-4e68-8d1d-4ee4963e1c76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Audio">
+      <UniqueIdentifier>{375a16c8-70a0-4f06-977e-f8441c74b76f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Base">
       <UniqueIdentifier>{701e8c80-f9a3-4f97-a0c7-3e8f5d21f77d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\base">
+    <Filter Include="ソース ファイル\Input">
+      <UniqueIdentifier>{37db0608-dc16-47bf-9009-fe8d17caff73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Math">
+      <UniqueIdentifier>{dba95ec4-7b26-4cd4-b620-da7507bb3c63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Model">
+      <UniqueIdentifier>{583eb888-33b2-41b1-9df5-bdec3c60481d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{12d57838-33a1-49b7-b22d-3fee260c9c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Audio">
+      <UniqueIdentifier>{ab52bc7d-4fbc-4c31-a5a8-6793f63eec37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Base">
       <UniqueIdentifier>{2f2c09b4-16bc-4bcb-a1fe-f0beefada121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Input">
+      <UniqueIdentifier>{d2b5372f-df88-4db6-a0d5-f9f30fbf70d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Math">
+      <UniqueIdentifier>{3a60b5c0-499a-4262-991d-8bb24bd4ffea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Model">
+      <UniqueIdentifier>{18f538e6-1d91-4467-8964-4d55d181ab07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{56fdece2-10d2-4c39-83d7-7762e6e3066a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\DebugCamera">
+      <UniqueIdentifier>{ce8511c5-a0dd-4c3d-87af-3e4f17c99d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\CollisionManager">
+      <UniqueIdentifier>{5e22e750-ad3c-4015-a64a-9b73976795a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\CollisionManager">
+      <UniqueIdentifier>{93f2391d-cd36-46bc-8e69-2e5de7045492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Sprite">
+      <UniqueIdentifier>{c63c966e-5db8-46d7-bea2-e17fefc8280f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Sprite">
+      <UniqueIdentifier>{aac5634a-d40f-4439-a09b-79f03466f534}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,31 +115,28 @@
       <Filter>ソース ファイル\ImGuiManager</Filter>
     </ClCompile>
     <ClCompile Include="math\MathFunction.cpp">
-      <Filter>ソース ファイル\math</Filter>
+      <Filter>ソース ファイル\Math</Filter>
     </ClCompile>
     <ClCompile Include="model\DirectionalLight.cpp">
-      <Filter>ソース ファイル\model</Filter>
+      <Filter>ソース ファイル\Model</Filter>
     </ClCompile>
     <ClCompile Include="model\Material.cpp">
-      <Filter>ソース ファイル\model</Filter>
+      <Filter>ソース ファイル\Model</Filter>
     </ClCompile>
     <ClCompile Include="model\Model.cpp">
-      <Filter>ソース ファイル\model</Filter>
+      <Filter>ソース ファイル\Model</Filter>
     </ClCompile>
     <ClCompile Include="model\Vertex.cpp">
-      <Filter>ソース ファイル\model</Filter>
+      <Filter>ソース ファイル\Model</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameManager.cpp">
-      <Filter>ソース ファイル\scene</Filter>
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
-      <Filter>ソース ファイル\scene</Filter>
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
     <ClCompile Include="scene\TitleScene.cpp">
-      <Filter>ソース ファイル\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite\Sprite.cpp">
-      <Filter>ソース ファイル\sprite</Filter>
+      <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
     <ClCompile Include="TransformationMatrix\TransformationMatrix.cpp">
       <Filter>ソース ファイル\TransformationMatrix</Filter>
@@ -127,13 +148,28 @@
       <Filter>ソース ファイル\TransformationMatrix</Filter>
     </ClCompile>
     <ClCompile Include="base\DirectXCommon.cpp">
-      <Filter>ソース ファイル\base</Filter>
+      <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
     <ClCompile Include="base\TextureManager.cpp">
-      <Filter>ソース ファイル\base</Filter>
+      <Filter>ソース ファイル\Base</Filter>
     </ClCompile>
     <ClCompile Include="base\WinApp.cpp">
-      <Filter>ソース ファイル\base</Filter>
+      <Filter>ソース ファイル\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="audio\Audio.cpp">
+      <Filter>ソース ファイル\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Input.cpp">
+      <Filter>ソース ファイル\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCamera\DebugCamera.cpp">
+      <Filter>ソース ファイル\DebugCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager\CollisionManager.cpp">
+      <Filter>ソース ファイル\CollisionManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\Sprite.cpp">
+      <Filter>ソース ファイル\Sprite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,34 +201,31 @@
       <Filter>ヘッダー ファイル\ImGuiManager</Filter>
     </ClInclude>
     <ClInclude Include="math\MathFunction.h">
-      <Filter>ヘッダー ファイル\math</Filter>
+      <Filter>ヘッダー ファイル\Math</Filter>
     </ClInclude>
     <ClInclude Include="model\DirectionalLight.h">
-      <Filter>ヘッダー ファイル\model</Filter>
+      <Filter>ヘッダー ファイル\Model</Filter>
     </ClInclude>
     <ClInclude Include="model\Material.h">
-      <Filter>ヘッダー ファイル\model</Filter>
+      <Filter>ヘッダー ファイル\Model</Filter>
     </ClInclude>
     <ClInclude Include="model\Model.h">
-      <Filter>ヘッダー ファイル\model</Filter>
+      <Filter>ヘッダー ファイル\Model</Filter>
     </ClInclude>
     <ClInclude Include="model\Vertex.h">
-      <Filter>ヘッダー ファイル\model</Filter>
+      <Filter>ヘッダー ファイル\Model</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameManager.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameScene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="scene\IScene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="scene\TitleScene.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite\Sprite.h">
-      <Filter>ヘッダー ファイル\sprite</Filter>
+      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="TransformationMatrix\TransformationMatrix.h">
       <Filter>ヘッダー ファイル\TransformationMatrix</Filter>
@@ -204,16 +237,37 @@
       <Filter>ヘッダー ファイル\TransformationMatrix</Filter>
     </ClInclude>
     <ClInclude Include="base\D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル\base</Filter>
+      <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
     <ClInclude Include="base\DirectXCommon.h">
-      <Filter>ヘッダー ファイル\base</Filter>
+      <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
     <ClInclude Include="base\TextureManager.h">
-      <Filter>ヘッダー ファイル\base</Filter>
+      <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
     <ClInclude Include="base\WinApp.h">
-      <Filter>ヘッダー ファイル\base</Filter>
+      <Filter>ヘッダー ファイル\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="audio\Audio.h">
+      <Filter>ヘッダー ファイル\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>ヘッダー ファイル\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCamera\DebugCamera.h">
+      <Filter>ヘッダー ファイル\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager\Collider.h">
+      <Filter>ヘッダー ファイル\CollisionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager\CollisionConfig.h">
+      <Filter>ヘッダー ファイル\CollisionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager\CollisionManager.h">
+      <Filter>ヘッダー ファイル\CollisionManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\Sprite.h">
+      <Filter>ヘッダー ファイル\Sprite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

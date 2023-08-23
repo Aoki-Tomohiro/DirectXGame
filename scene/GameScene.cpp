@@ -3,20 +3,40 @@
 
 GameScene::GameScene() {};
 
-GameScene::~GameScene() {};
+GameScene::~GameScene() {
+	delete collisionManager_;
+	delete debugCamera_;
+	delete sprite_;
+	delete modelPlane_;
+};
 
 void GameScene::Initialize(GameManager* gameManager) {
+	//DirectXのインスタンスを取得
 	dxCommon_ = DirectXCommon::GetInstance();
+	//TextureManagerのインスタンスを取得
 	textureManager_ = TextureManager::GetInstance();
-	imguiManager_ = ImGuiManager::GetInstance();
+	//Audioのインスタンスを取得
+	audio_ = Audio::GetInstance();
+	//Inputのインスタンスを取得
+	input_ = Input::GetInstance();
+	//デバッグカメラの生成
+	debugCamera_ = new DebugCamera();
+	//追従対象の設定
+	debugCamera_->SetTarget(&worldTransformPlane_);
 	//画像読み込み
 	textureHandle_ = textureManager_->Load("resources/uvChecker.png");
+	//音声データ読み込み
+	audioHandle_ = audio_->SoundLoadWave("resources/Alarm01.wav");
 	//スプライトの作成
-	sprite_ = std::make_unique<Sprite>();
+	sprite_ = new Sprite();
 	sprite_->Create(textureHandle_, translation_);
 	//モデルの作成
-	modelPlane_ = std::make_unique<Model>();
-	modelPlane_->CreateFromOBJ("resources", "plane.obj");
+	modelPlane_ = new Model();
+	modelPlane_->CreateFromOBJ("resources", "teapot.obj");
+	//衝突マネージャーの作成
+	collisionManager_ = new CollisionManager();
+	////再生
+	//audio_->SoundPlayWave(audioHandle_);
 };
 
 void GameScene::Update(GameManager* gameManager) {
@@ -28,12 +48,30 @@ void GameScene::Update(GameManager* gameManager) {
 	sprite_->SetUVTranslation(uvTranslation_);
 	sprite_->SetUVRotation(uvRotation_);
 	sprite_->SetUVScale(uvScale_);
-	//モデル
+	//モデルのワールドトランスフォームの更新
 	worldTransformPlane_.UpdateMatrix();
+	//デバッグカメラの更新
+	debugCamera_->Update();
+	//デバッグカメラの切り替え
+	if (input_->PushKeyEnter(DIK_1)) {
+		if (isDebugCameraActive_ == false) {
+			isDebugCameraActive_ = true;
+		}
+		else {
+			isDebugCameraActive_ = false;
+		}
+	}
 	//ビュープロジェクションの更新
-	viewProjection_.UpdateMatrix();
+	if (isDebugCameraActive_ == true) {
+		viewProjection_.matView_ = debugCamera_->GetViewProjection().matView_;
+		viewProjection_.matProjection_ = debugCamera_->GetViewProjection().matProjection_;
+	}
+	else {
+		viewProjection_.UpdateMatrix();
+	}
 
 	ImGui::Begin(" ");
+	//スプライト
 	if (ImGui::TreeNode("Sprite")) {
 		ImGui::DragFloat2("translation", &translation_.x, 1.0f, 0.0f, 1280.0f);
 		ImGui::DragFloat2("scale", &scale_.x, 0.01f, -10.0f, 10.0f);
@@ -44,12 +82,20 @@ void GameScene::Update(GameManager* gameManager) {
 		ImGui::SliderAngle("UVRotate", &uvRotation_);
 		ImGui::TreePop();
 	}
+	//モデル
 	if (ImGui::TreeNode("Plane")) {
 		ImGui::DragFloat3("translate", &worldTransformPlane_.translation_.x, 0.01f);
 		ImGui::DragFloat3("rotate", &worldTransformPlane_.rotation_.x, 0.01f);
 		ImGui::DragFloat3("scale", &worldTransformPlane_.scale_.x, 0.01f);
 		ImGui::TreePop();
 	}
+	//デバッグカメラ
+	ImGui::Checkbox("DebugCamera", &isDebugCameraActive_);
+	ImGui::Text("1 : DebugCamera");
+	ImGui::Text("WASD : Move up/down/left/right");
+	ImGui::Text("MouseWheel : Move forward/backward");
+	ImGui::Text("Left Right : RotateX");
+	ImGui::Text("UP DOWN : RotateY");
 	ImGui::End();
 };
 
