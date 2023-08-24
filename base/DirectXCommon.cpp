@@ -36,6 +36,8 @@ void DirectXCommon::Initialize() {
 	//ビューの作成
 	DirectXCommon::CreateRenderTargetView();
 	DirectXCommon::CreateDepthStencilView();
+	//マルチパス用のディスクリプタヒープの作成
+	multiPassRTVDescriptorHeap_ = DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 }
 
 void DirectXCommon::CreateDXGIDevice() {
@@ -260,6 +262,19 @@ void DirectXCommon::CreateRenderTargetView() {
 	rtvHandles[1] = DirectXCommon::GetCPUDescriptorHandle(rtvDescriptorHeap_, descriptorSizeRTV, 1);
 	//２つ目を作る
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles[1]);
+}
+
+uint32_t DirectXCommon::CreateMultiPassRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
+	rtvIndex_++;
+	//RTVの設定
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	rtvDesc.Format = format;
+	//一パス目用RTVの作成
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPUDescriptorHandle(multiPassRTVDescriptorHeap_, descriptorSizeRTV, rtvIndex_);
+	device_->CreateRenderTargetView(resource.Get(), &rtvDesc, rtvHandle);
+
+	return rtvIndex_;
 }
 
 void DirectXCommon::CreateDepthStencilView() {

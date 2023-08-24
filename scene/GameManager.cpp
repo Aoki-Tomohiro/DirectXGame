@@ -22,6 +22,9 @@ GameManager::GameManager() {
 	//Inputの初期化
 	input_ = Input::GetInstance();
 	input_->Initialize();
+	//ポストプロセスの初期化
+	postProcess_ = PostProcess::GetInstance();
+	postProcess_->Initialize();
 	//モデルの初期化
 	Model::Initialize();
 	//スプライトの初期化
@@ -36,6 +39,7 @@ GameManager::~GameManager() {
 	nowScene_ = nullptr;
 	Sprite::Delete();
 	Model::Delete();
+	PostProcess::DeleteInstance();
 	Input::DeleteInstance();
 	Audio::DeleteInstance();
 	ImGuiManager::DeleteInstance();
@@ -66,10 +70,17 @@ void GameManager::run() {
 		//ImGui受付終了
 		imguiManager_->End();
 
-		//描画開始
-		dxCommon_->PreDraw();
+		//ポストプロセスの描画前処理
+		postProcess_->PreDraw();
 		//ゲームシーンの描画
 		nowScene_->Draw(this);
+		//ポストプロセスの描画後処理
+		postProcess_->PostDraw();
+
+		//描画開始
+		dxCommon_->PreDraw();
+		//ポストプロセスの描画
+		postProcess_->Draw();
 		//ImGuiの描画
 		imguiManager_->Draw();
 		//描画終了

@@ -42,7 +42,7 @@ public:
 	/// <summary>
 	/// DXCompilerの初期化
 	/// </summary>
-	static void InitializeDXCompiler();
+	static void InitializeDxcCompiler();
 
 	/// <summary>
 	/// シェーダーの読み込み
@@ -128,7 +128,7 @@ public:
 private:
 	//DXCompiler
 	static Microsoft::WRL::ComPtr<IDxcUtils> sDxcUtils_;
-	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDXCompiler_;
+	static Microsoft::WRL::ComPtr<IDxcCompiler3> sDxcCompiler_;
 	static Microsoft::WRL::ComPtr<IDxcIncludeHandler> sIncludeHandler_;
 	//ルートシグネチャ
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature_;

@@ -35,10 +35,22 @@ public:
 	uint32_t Load(const std::string& filePath);
 
 	/// <summary>
+	/// マルチパス用のテクスチャの作成
+	/// </summary>
+	uint32_t CreateMultiPassTexture(DXGI_FORMAT format, const float clearColor[]);
+
+	/// <summary>
 	/// テクスチャリソースの作成
 	/// </summary>
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// マルチパス用リソースの作成 
+	/// </summary>
+	/// <param name="device"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateMultiPassResource(int32_t width, int32_t height, DXGI_FORMAT format, const float clearColor[]);
 
 	/// <summary>
 	/// テクスチャをアップロード
@@ -55,17 +67,32 @@ public:
     void CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata);
 
 	/// <summary>
-	/// デスクリプタテーブルをセット
+	/// マルチパス用のシェーダーリソースビューの作成
+	/// </summary>
+	void CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
+
+	/// <summary>
+	/// ディスクリプタヒープをセット
+	/// </summary>
+	void SetGraphicsDescriptorHeap();
+
+	/// <summary>
+	/// ディスクリプタテーブルをセット
 	/// </summary>
 	/// <param name="textureHandle"></param>
-	void SetGraphicsCommand(UINT rootParameterIndex, uint32_t textureHandle);
+	void SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t textureHandle);
 
 	/// <summary>
 	/// リソース情報を取得
 	/// </summary>
 	/// <param name="textureHandle"></param>
 	/// <returns></returns>
-	const D3D12_RESOURCE_DESC GetResourceDesc(uint32_t textureHandle);
+	D3D12_RESOURCE_DESC GetResourceDesc(uint32_t textureHandle);
+
+	/// <summary>
+	/// リソースを取得
+	/// </summary>
+	ID3D12Resource* GetTextureResource(uint32_t textureHandle) { return textures_[textureHandle].resource.Get(); };
 
 private:
 	TextureManager() = default;

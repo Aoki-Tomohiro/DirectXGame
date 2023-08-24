@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "Audio.h"
 #include "Input.h"
+#include "PostProcess.h"
 #include "DebugCamera.h"
 #include "ImGuiManager.h"
 #include "WorldTransform.h"
@@ -48,6 +49,8 @@ private:
 	Audio* audio_ = nullptr;
 	//Input
 	Input* input_ = nullptr;
+	//PostProcess
+	PostProcess* postProcess_ = nullptr;
 	//DebugCamera
 	DebugCamera* debugCamera_ = nullptr;
 	//DebugCameraの切り替え

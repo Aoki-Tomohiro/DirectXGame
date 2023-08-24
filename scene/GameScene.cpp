@@ -19,6 +19,8 @@ void GameScene::Initialize(GameManager* gameManager) {
 	audio_ = Audio::GetInstance();
 	//Inputのインスタンスを取得
 	input_ = Input::GetInstance();
+	//PostProcessのインスタンスを取得
+	postProcess_ = PostProcess::GetInstance();
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera();
 	//追従対象の設定

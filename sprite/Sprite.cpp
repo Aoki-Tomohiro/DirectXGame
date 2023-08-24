@@ -1,7 +1,7 @@
 #include "Sprite.h"
 
 Microsoft::WRL::ComPtr<IDxcUtils> Sprite::sDxcUtils_ = nullptr;
-Microsoft::WRL::ComPtr<IDxcCompiler3> Sprite::sDXCompiler_ = nullptr;
+Microsoft::WRL::ComPtr<IDxcCompiler3> Sprite::sDxcCompiler_ = nullptr;
 Microsoft::WRL::ComPtr<IDxcIncludeHandler> Sprite::sIncludeHandler_ = nullptr;
 Microsoft::WRL::ComPtr<ID3D12RootSignature>  Sprite::sRootSignature_ = nullptr;
 Microsoft::WRL::ComPtr<ID3D12PipelineState>  Sprite::sPipelineState_ = nullptr;
@@ -9,8 +9,8 @@ ID3D12GraphicsCommandList* Sprite::sCommandList_ = nullptr;
 Matrix4x4 Sprite::sMatProjection_{};
 
 void Sprite::Initialize() {
-	//DXCCompilerの初期化
-	Sprite::InitializeDXCompiler();
+	//DxcCompilerの初期化
+	Sprite::InitializeDxcCompiler();
 	//パイプラインステートの作成
 	Sprite::CreatePipelineStateObject();
 	//コマンドリストを取得
@@ -28,10 +28,10 @@ void Sprite::Delete() {
 	}
 }
 
-void Sprite::InitializeDXCompiler() {
+void Sprite::InitializeDxcCompiler() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&sDxcUtils_));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDXCompiler_));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&sDxcCompiler_));
 	assert(SUCCEEDED(hr));
 
 	//現時点でincludeはしないが、includeに対応するための設定を行っていく
@@ -183,11 +183,11 @@ void Sprite::CreatePipelineStateObject() {
 
 	//Shaderをコンパイルする
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"shader/SpriteVS.hlsl",
-		L"vs_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
+		L"vs_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
 	assert(vertexShaderBlob != nullptr);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"shader/SpritePS.hlsl",
-		L"ps_6_0", sDxcUtils_.Get(), sDXCompiler_.Get(), sIncludeHandler_.Get());
+		L"ps_6_0", sDxcUtils_.Get(), sDxcCompiler_.Get(), sIncludeHandler_.Get());
 	assert(pixelShaderBlob != nullptr);
 
 	//DepthStencilStateの設定
@@ -209,9 +209,9 @@ void Sprite::CreatePipelineStateObject() {
 	pixelShaderBlob->GetBufferSize() };//PixelShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	////graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	//書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -311,8 +311,10 @@ void Sprite::Draw() {
 	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::TransformationMatrix), WVPResource_->GetGPUVirtualAddress());
 	//MaterialResourceを設定
 	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::Material), MaterialResource_->GetGPUVirtualAddress());
+	//ディスクリプタヒープをセット
+	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsCommand(UINT(RootParameterIndex::Texture), textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(UINT(RootParameterIndex::Texture), textureHandle_);
 	//形状を設定
 	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画

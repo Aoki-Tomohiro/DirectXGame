@@ -6,6 +6,7 @@
 #include "ImGuiManager.h"
 #include "Audio.h"
 #include "Input.h"
+#include "PostProcess.h"
 #include "IScene.h"
 #include <memory>
 
@@ -41,5 +42,6 @@ private:
 	ImGuiManager* imguiManager_ = nullptr;
 	Audio* audio_ = nullptr;
 	Input* input_ = nullptr;
+	PostProcess* postProcess_ = nullptr;
 	IScene* nowScene_;
 };

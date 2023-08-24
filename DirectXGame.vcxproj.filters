@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
@@ -19,14 +15,48 @@
     <Filter Include="shader">
       <UniqueIdentifier>{3ba02e86-d136-4605-bc0a-5ec7812bc9c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\ImGuiManager">
-      <UniqueIdentifier>{78ede397-19a2-4bd9-b852-89b8cbc82b91}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\ImGuiManager">
       <UniqueIdentifier>{ed1d45eb-d48e-45c3-a02c-6764c81c3b19}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\TransformationMatrix">
       <UniqueIdentifier>{1e229100-034f-43ac-8af4-6c5c2086b800}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Audio">
+      <UniqueIdentifier>{ab52bc7d-4fbc-4c31-a5a8-6793f63eec37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Base">
+      <UniqueIdentifier>{2f2c09b4-16bc-4bcb-a1fe-f0beefada121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Input">
+      <UniqueIdentifier>{d2b5372f-df88-4db6-a0d5-f9f30fbf70d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Math">
+      <UniqueIdentifier>{3a60b5c0-499a-4262-991d-8bb24bd4ffea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Model">
+      <UniqueIdentifier>{18f538e6-1d91-4467-8964-4d55d181ab07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{56fdece2-10d2-4c39-83d7-7762e6e3066a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\DebugCamera">
+      <UniqueIdentifier>{ce8511c5-a0dd-4c3d-87af-3e4f17c99d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\CollisionManager">
+      <UniqueIdentifier>{93f2391d-cd36-46bc-8e69-2e5de7045492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Sprite">
+      <UniqueIdentifier>{aac5634a-d40f-4439-a09b-79f03466f534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\PostProcess">
+      <UniqueIdentifier>{0906d53d-7bc5-42fa-81cf-96b599cdfb0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\ImGuiManager">
+      <UniqueIdentifier>{78ede397-19a2-4bd9-b852-89b8cbc82b91}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\TransformationMatrix">
       <UniqueIdentifier>{c9bfd463-0898-485a-951c-fab680155190}</UniqueIdentifier>
@@ -52,38 +82,14 @@
     <Filter Include="ソース ファイル\Scene">
       <UniqueIdentifier>{12d57838-33a1-49b7-b22d-3fee260c9c11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Audio">
-      <UniqueIdentifier>{ab52bc7d-4fbc-4c31-a5a8-6793f63eec37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Base">
-      <UniqueIdentifier>{2f2c09b4-16bc-4bcb-a1fe-f0beefada121}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Input">
-      <UniqueIdentifier>{d2b5372f-df88-4db6-a0d5-f9f30fbf70d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Math">
-      <UniqueIdentifier>{3a60b5c0-499a-4262-991d-8bb24bd4ffea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Model">
-      <UniqueIdentifier>{18f538e6-1d91-4467-8964-4d55d181ab07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Scene">
-      <UniqueIdentifier>{56fdece2-10d2-4c39-83d7-7762e6e3066a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\DebugCamera">
-      <UniqueIdentifier>{ce8511c5-a0dd-4c3d-87af-3e4f17c99d7a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\CollisionManager">
       <UniqueIdentifier>{5e22e750-ad3c-4015-a64a-9b73976795a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\CollisionManager">
-      <UniqueIdentifier>{93f2391d-cd36-46bc-8e69-2e5de7045492}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\Sprite">
       <UniqueIdentifier>{c63c966e-5db8-46d7-bea2-e17fefc8280f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Sprite">
-      <UniqueIdentifier>{aac5634a-d40f-4439-a09b-79f03466f534}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\PostProcess">
+      <UniqueIdentifier>{45d1b07b-daf3-43e9-83cc-87f4347df723}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="Sprite\Sprite.cpp">
       <Filter>ソース ファイル\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\PostProcess.cpp">
+      <Filter>ソース ファイル\PostProcess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +278,9 @@
     <ClInclude Include="Sprite\Sprite.h">
       <Filter>ヘッダー ファイル\Sprite</Filter>
     </ClInclude>
+    <ClInclude Include="PostProcess\PostProcess.h">
+      <Filter>ヘッダー ファイル\PostProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -280,6 +292,9 @@
       <Filter>shader</Filter>
     </None>
     <None Include="shader\Sprite.hlsli">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="Shader\FinalPass.hlsli">
       <Filter>shader</Filter>
     </None>
   </ItemGroup>
@@ -294,6 +309,12 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="shader\SpriteVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\FinalPassVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\FinalPassPS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

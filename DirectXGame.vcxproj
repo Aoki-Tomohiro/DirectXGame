@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;$(ProjectDir)PostProcess;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Audio;$(ProjectDir)Base;$(ProjectDir)CollisionManager;$(ProjectDir)DebugCamera;$(ProjectDir)Externals/DirectXTex;$(ProjectDir)Externals/imgui;$(ProjectDir)ImGuiManager;$(ProjectDir)Input;$(ProjectDir)Math;$(ProjectDir)Model;$(ProjectDir)Sprite;$(ProjectDir)TransformationMatrix;$(ProjectDir)PostProcess;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -111,6 +111,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="model\Material.cpp" />
     <ClCompile Include="model\Model.cpp" />
     <ClCompile Include="model\Vertex.cpp" />
+    <ClCompile Include="PostProcess\PostProcess.cpp" />
     <ClCompile Include="scene\GameManager.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\TitleScene.cpp" />
@@ -144,6 +145,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="model\Material.h" />
     <ClInclude Include="model\Model.h" />
     <ClInclude Include="model\Vertex.h" />
+    <ClInclude Include="PostProcess\PostProcess.h" />
     <ClInclude Include="scene\GameManager.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\IScene.h" />
@@ -162,6 +164,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\FinalPass.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="shader\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -172,6 +178,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shader\FinalPassPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shader\FinalPassVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="shader\Object3d.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

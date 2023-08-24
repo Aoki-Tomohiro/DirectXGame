@@ -21,6 +21,7 @@ void TextureManager::Initialize() {
 }
 
 uint32_t TextureManager::Load(const std::string& filePath) {
+	//srvIndexをインクリメント
 	srvIndex_++;
 	//テクスチャファイルを読んでプログラムを扱えるようにする
 	DirectX::ScratchImage image{};
@@ -40,6 +41,17 @@ uint32_t TextureManager::Load(const std::string& filePath) {
 
 	//SRVの作成
 	TextureManager::CreateShaderResourceView(textures_[srvIndex_].resource, metadata);
+
+	return srvIndex_;
+}
+
+uint32_t TextureManager::CreateMultiPassTexture(DXGI_FORMAT format,const float clearColor[]) {
+	//srvIndexをインクリメント
+	srvIndex_++;
+	//マルチパス用のリソースを作成
+	textures_[srvIndex_].resource = TextureManager::CreateMultiPassResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, format, clearColor);
+	//マルチパス用のSRVの作成
+	TextureManager::CreateMultiPassShaderResourceView(textures_[srvIndex_].resource, format);
 
 	return srvIndex_;
 }
@@ -71,6 +83,39 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 		nullptr,
 		IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
+	return resource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateMultiPassResource(int32_t width, int32_t height, DXGI_FORMAT format, const float clearColor[]) {
+	//ヒープの設定
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	//リソースの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = format;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	//ClearValue
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearValue.Color[0] = clearColor[0];
+	clearValue.Color[1] = clearColor[1];
+	clearValue.Color[2] = clearColor[2];
+	clearValue.Color[3] = clearColor[3];
+
+	//リソースの作成
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = dxCommon_->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
+		&resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
 	return resource;
 }
 
@@ -108,13 +153,33 @@ void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D1
 	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
 }
 
-void TextureManager::SetGraphicsCommand(UINT rootParameterIndex, uint32_t textureHandle) {
+void TextureManager::CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
+	//SRVの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Format = format;
+	srvDesc.Texture2D.MipLevels = 1;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	//SRVを作成するDescriptorHeapの場所を決める
+	textures_[srvIndex_].cpuHandleSRV = dxCommon_->GetCPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	textures_[srvIndex_].gpuHandleSRV = dxCommon_->GetGPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	//SRVを作成
+	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
+}
+
+void TextureManager::SetGraphicsDescriptorHeap() {
+	//ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+}
+
+void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t textureHandle) {
+	//ディスクリプタテーブルをセット
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].gpuHandleSRV);
 }
 
-const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {
+D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {
 	//リソース情報の取得
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc = textures_[textureHandle].resource->GetDesc();

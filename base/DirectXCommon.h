@@ -86,6 +86,11 @@ public:
 	/// レンダーターゲットビューの作成
 	/// </summary>
 	void CreateRenderTargetView();
+
+	/// <summary>
+	/// マルチパス用のレンダーターゲットビューの作成
+	/// </summary>
+	uint32_t CreateMultiPassRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
 	
 	/// <summary>
 	/// 深度ステンシルビューの作成
@@ -150,6 +155,12 @@ public:
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; };
 
+	/// <summary>
+	/// マルチパス用のRTVディスクリプタヒープを取得
+	/// </summary>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetMultiPassRTVDescriptorHeap() { return multiPassRTVDescriptorHeap_; };
+
 private:
 	DirectXCommon() = default;
 	~DirectXCommon() = default;
@@ -187,4 +198,7 @@ private:
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
+	//マルチパス用のRTVディスクリプタヒープ
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> multiPassRTVDescriptorHeap_ = nullptr;
+	uint32_t rtvIndex_ = -1;
 };
