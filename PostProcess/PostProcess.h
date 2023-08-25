@@ -12,37 +12,47 @@ public:
 		Vector2 texcoord;
 	};
 
-	struct ConstBufferDataGaussianBlur {
+	struct GuassianBlurData {
 		int32_t textureWidth;
 		int32_t textureHeight;
 		float padding[2];
 		float weight[8];
 	};
 
-	struct ConstBufferDataBloom {
+	struct BloomData {
+		//フラグ
 		bool enable;
 		float padding[3];
 	};
 
-	struct ConstBufferDataFog {
+	struct FogData {
+		//フラグ
 		bool enable;
+		//スケール
 		float scale;
+		//減衰率
 		float attenuationRate;
 	};
 
-	struct ConstBufferDataDof {
+	struct DofData {
+		//フラグ
 		bool enable;
 		float padding[3];
 	};
 
-	struct ConstBufferDataLensDistortion {
+	struct LensDistortionData {
+		//フラグ
 		bool enable;
+		//歪みのきつさ
 		float tightness;
+		//歪みの強さ
 		float strength;
 	};
 
-	struct ConstBufferDataVignette {
+	struct VignetteData {
+		//フラグ
 		bool enable;
+		//強度
 		float intensity;
 	};
 
@@ -67,6 +77,22 @@ public:
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画前処理
+	/// </summary>
+	void PreDraw();
+
+	/// <summary>
+	/// 描画後処理
+	/// </summary>
+	void PostDraw();
+
+	/// <summary>
+	/// 最終パス描画処理
+	/// </summary>
+	void Draw();
+
+private:
 	/// <summary>
     /// DXCompilerの初期化
     /// </summary>
@@ -109,16 +135,6 @@ public:
 	/// マルチパス用のレンダーターゲットビューの作成
 	/// </summary>
 	uint32_t CreateMultiPassRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
-
-	/// <summary>
-	/// 描画前処理
-	/// </summary>
-	void PreDraw();
-
-	/// <summary>
-	/// 描画後処理
-	/// </summary>
-	void PostDraw();
 
 	/// <summary>
 	/// 二パス目描画前処理
@@ -180,11 +196,6 @@ public:
 	/// </summary>
 	void Blur(const Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipelineState, uint32_t blurSRVIndex, uint32_t highIntensityBlurSRVIndex);
 
-	/// <summary>
-	/// 最終パス描画処理
-	/// </summary>
-	void Draw();
-
 private:
 	//インスタンス
 	static PostProcess* instance;
@@ -223,6 +234,31 @@ private:
 	//マルチパス用の深度バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
+	//ブラー用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> gaussianBlurResource_ = nullptr;
+	//書き込み用
+	GuassianBlurData* gaussianBlurData_ = nullptr;
+	//Bloom用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> bloomResource_ = nullptr;
+	//書き込み用
+	BloomData* bloomData_ = nullptr;
+	//フォグ用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> fogResource_ = nullptr;
+	//書き込み用
+	FogData* fogData_ = nullptr;
+	//Dof用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> dofResource_ = nullptr;
+	//書き込み用
+	DofData* dofData_ = nullptr;
+	//LensDistortion用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> lensDistortionResource_ = nullptr;
+	//書き込み用
+	LensDistortionData* lensDistortionData_ = nullptr;
+	//ビネット用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
+	//書き込み用
+	VignetteData* vignetteData_ = nullptr;
+
 	//一パス目のディスクリプタハンドル
 	uint32_t firstPassRTVIndex_ = 0;
 	uint32_t firstPassSRVIndex_ = 0;
@@ -248,30 +284,32 @@ private:
 	uint32_t highIntensityShrinkBlurRTVIndex_[2] = {};
 	uint32_t highIntensityShrinkBlurSRVIndex_[2] = {};
 
-	//ブラー用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> gaussianBlurResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataGaussianBlur* gaussianBlurData_ = nullptr;
-	//分散値
-	float s_ = 5.0f;
-	//Bloom用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> bloomResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataBloom* bloomData_ = nullptr;
-	//フォグ用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> fogResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataFog* fogData_ = nullptr;
-	//Dof用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> dofResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataDof* dofData_ = nullptr;
-	//LensDistortion用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> lensDistortionResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataLensDistortion* lensDistortionData_ = nullptr;
-	//ビネット用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataVignette* vignetteData_ = nullptr;
+public:
+	//ポストプロセスの有効フラグ
+	bool isActive = false;
+
+	//Bloomの有効フラグ
+	bool isBloomActive = false;
+
+	//Fogの調整項目
+	bool isFogActive = false;
+	//スケール
+	float fogScale = 0.5f;
+	//減衰率
+	float fogAttenuationRate = 2.0f;
+
+	//Dofの調整項目
+	bool isDofActive = false;
+
+	//LensDistortionの調整項目
+	bool isLensDistortionActive = false;
+	//歪みのきつさ
+	float lensDistortionTightness = 2.5f;
+	//歪みの強さ
+	float lensDistortionStrength  = -0.1f;
+
+	//Vignetteの調整項目
+	bool isVignetteActive = false;
+	//強度
+	float vignetteIntensity = 1.0f;
 };

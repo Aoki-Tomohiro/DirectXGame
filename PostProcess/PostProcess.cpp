@@ -28,6 +28,7 @@ void PostProcess::Initialize() {
 	//コマンドリストを取得
 	commandList_ = dxCommon_->GetCommandList().Get();
 
+
 	//頂点の作成
 	vertices_.push_back(VertexPosUV{ {-1.0f,-1.0f,1.0,1.0f},{0.0f,1.0f} });
 	vertices_.push_back(VertexPosUV{ {-1.0f,1.0f,1.0f,1.0f},{0.0f,0.0f} });
@@ -35,6 +36,7 @@ void PostProcess::Initialize() {
 	vertices_.push_back(VertexPosUV{ {-1.0f,1.0f,1.0f,1.0f},{0.0f,0.0f} });
 	vertices_.push_back(VertexPosUV{ {1.0f,1.0f,1.0f,1.0f},{1.0f,0.0f} });
 	vertices_.push_back(VertexPosUV{ {1.0f,-1.0f,1.0f,1.0f},{1.0f,1.0f} });
+	
 	//頂点バッファを作成
 	vertexResource_ = dxCommon_->CreateBufferResource(sizeof(VertexPosUV) * vertices_.size());
 	//頂点バッファビューを作成
@@ -46,23 +48,6 @@ void PostProcess::Initialize() {
 	std::memcpy(vertexData_, vertices_.data(), sizeof(VertexPosUV) * vertices_.size());
 	vertexResource_->Unmap(0, nullptr);
 
-	//ガウシアンぼかし用のリソースの作成
-	gaussianBlurResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataGaussianBlur));
-	//ガウシアンぼかし用のリソースに書き込む
-	gaussianBlurResource_->Map(0, nullptr, reinterpret_cast<void**>(&gaussianBlurData_));
-	gaussianBlurData_->textureWidth = WinApp::GetInstance()->kClientWidth;
-	gaussianBlurData_->textureHeight = WinApp::GetInstance()->kClientHeight;
-	float total = 0.0f;
-	for (int i = 0; i < 8; i++) {
-		gaussianBlurData_->weight[i] = expf(-(i * i) / (2 * s_ * s_));
-		total += gaussianBlurData_->weight[i];
-	}
-	total = total * 2.0f - 1.0f;
-	//最終的な合計値で重みをわる
-	for (int i = 0; i < 8; i++) {
-		gaussianBlurData_->weight[i] /= total;
-	}
-	gaussianBlurResource_->Unmap(0, nullptr);
 
 	//マルチパス用のディスクリプタヒープの作成
 	multiPassRTVDescriptorHeap_ = dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 12, false);
@@ -72,20 +57,84 @@ void PostProcess::Initialize() {
 	//マルチパス用のDepthStencilViewの作成
 	dxCommon_->CreateDepthStencilView(multiPassDSVDescriptorHeap_, depthStencilResource_);
 
+
+	//ガウシアンぼかし用のリソースの作成
+	gaussianBlurResource_ = dxCommon_->CreateBufferResource(sizeof(GuassianBlurData));
+	//ガウシアンぼかし用のリソースに書き込む
+	gaussianBlurResource_->Map(0, nullptr, reinterpret_cast<void**>(&gaussianBlurData_));
+	gaussianBlurData_->textureWidth = WinApp::GetInstance()->kClientWidth;
+	gaussianBlurData_->textureHeight = WinApp::GetInstance()->kClientHeight;
+	float total = 0.0f;
+	for (int i = 0; i < 8; i++) {
+		gaussianBlurData_->weight[i] = expf(-(i * i) / (2 * 5.0f * 5.0f));
+		total += gaussianBlurData_->weight[i];
+	}
+	total = total * 2.0f - 1.0f;
+	//最終的な合計値で重みをわる
+	for (int i = 0; i < 8; i++) {
+		gaussianBlurData_->weight[i] /= total;
+	}
+	gaussianBlurResource_->Unmap(0, nullptr);
+
+	//Bloom用のリソースを作成
+	bloomResource_ = dxCommon_->CreateBufferResource(sizeof(BloomData));
+	//Bloom用のリソースに書き込む
+	bloomResource_->Map(0, nullptr, reinterpret_cast<void**>(&bloomData_));
+	bloomData_->enable = isBloomActive;
+	bloomResource_->Unmap(0, nullptr);
+
+	//フォグ用のリソースを作成
+	fogResource_ = dxCommon_->CreateBufferResource(sizeof(FogData));
+	//フォグ用のリソースに書き込む
+	fogResource_->Map(0, nullptr, reinterpret_cast<void**>(&fogData_));
+	fogData_->enable = isFogActive;
+	fogData_->scale = fogScale;
+	fogData_->attenuationRate = fogAttenuationRate;
+	fogResource_->Unmap(0, nullptr);
+
+	//Dof用のリソースを作成
+	dofResource_ = dxCommon_->CreateBufferResource(sizeof(DofData));
+	//Dof用のリソースに書き込む
+	dofResource_->Map(0, nullptr, reinterpret_cast<void**>(&dofData_));
+	dofData_->enable = isDofActive;
+	dofResource_->Unmap(0, nullptr);
+
+	//LensDistortion用のリソースを作成
+	lensDistortionResource_ = dxCommon_->CreateBufferResource(sizeof(LensDistortionData));
+	//LensDistortion用のリソースに書き込む
+	lensDistortionResource_->Map(0, nullptr, reinterpret_cast<void**>(&lensDistortionData_));
+	lensDistortionData_->enable = isLensDistortionActive;
+	lensDistortionData_->tightness = lensDistortionTightness;
+	lensDistortionData_->strength = lensDistortionStrength;
+	lensDistortionResource_->Unmap(0, nullptr);
+
+	//ビネット用のリソースの作成
+	vignetteResource_ = dxCommon_->CreateBufferResource(sizeof(VignetteData));
+	//ビネットのリソースに書き込む
+	vignetteResource_->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData_));
+	vignetteData_->enable = isVignetteActive;
+	vignetteData_->intensity = vignetteIntensity;
+	vignetteResource_->Unmap(0, nullptr);
+
+
 	//一パス目のリソースの作成
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	firstPassSRVIndex_ = TextureManager::GetInstance()->CreateMultiPassTextureResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 	firstPassRTVIndex_ = PostProcess::CreateMultiPassRenderTargetView(TextureManager::GetInstance()->GetTextureResource(firstPassSRVIndex_), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	
 	//線形深度のリソースの作成
 	float clearDepthColor[] = { 1.0f,0.0f,0.0f,0.0f };
 	linearDepthSRVIndex_ = TextureManager::GetInstance()->CreateMultiPassTextureResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, DXGI_FORMAT_R32_FLOAT, clearDepthColor);
 	linearDepthRTVIndex_ = PostProcess::CreateMultiPassRenderTargetView(TextureManager::GetInstance()->GetTextureResource(linearDepthSRVIndex_), DXGI_FORMAT_R32_FLOAT);
+	
 	//二パス目のリソースの作成
 	secondPassSRVIndex_ = TextureManager::GetInstance()->CreateMultiPassTextureResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 	secondPassRTVIndex_ = PostProcess::CreateMultiPassRenderTargetView(TextureManager::GetInstance()->GetTextureResource(secondPassSRVIndex_), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	
 	//高輝度用のリソースの作成
 	highIntensitySRVIndex_ = TextureManager::GetInstance()->CreateMultiPassTextureResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 	highIntensityRTVIndex_ = PostProcess::CreateMultiPassRenderTargetView(TextureManager::GetInstance()->GetTextureResource(highIntensitySRVIndex_), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	
 	//ブラー用のリソースの作成
 	for (int i = 0; i < 2; i++) {
 		//通常ぼかし
@@ -101,45 +150,33 @@ void PostProcess::Initialize() {
 		highIntensityShrinkBlurSRVIndex_[i] = TextureManager::GetInstance()->CreateMultiPassTextureResource(WinApp::GetInstance()->kClientWidth / 2, WinApp::GetInstance()->kClientHeight / 2, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 		highIntensityShrinkBlurRTVIndex_[i] = PostProcess::CreateMultiPassRenderTargetView(TextureManager::GetInstance()->GetTextureResource(highIntensityShrinkBlurSRVIndex_[i]), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	}
+}
 
-	//Bloom用のリソースを作成
-	bloomResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataBloom));
+void PostProcess::Update() {
 	//Bloom用のリソースに書き込む
 	bloomResource_->Map(0, nullptr, reinterpret_cast<void**>(&bloomData_));
-	bloomData_->enable = false;
+	bloomData_->enable = isBloomActive;
 	bloomResource_->Unmap(0, nullptr);
-
-	//フォグ用のリソースを作成
-	fogResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataFog));
 	//フォグ用のリソースに書き込む
 	fogResource_->Map(0, nullptr, reinterpret_cast<void**>(&fogData_));
-	fogData_->enable = false;
-	fogData_->scale = 0.5f;
-	fogData_->attenuationRate = 2.0f;
+	fogData_->enable = isFogActive;
+	fogData_->scale = fogScale;
+	fogData_->attenuationRate = fogAttenuationRate;
 	fogResource_->Unmap(0, nullptr);
-
-	//Dof用のリソースを作成
-	dofResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataDof));
 	//Dof用のリソースに書き込む
 	dofResource_->Map(0, nullptr, reinterpret_cast<void**>(&dofData_));
-	dofData_->enable = true;
+	dofData_->enable = isDofActive;
 	dofResource_->Unmap(0, nullptr);
-
-	//LensDistortion用のリソースを作成
-	lensDistortionResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataLensDistortion));
 	//LensDistortion用のリソースに書き込む
 	lensDistortionResource_->Map(0, nullptr, reinterpret_cast<void**>(&lensDistortionData_));
-	lensDistortionData_->enable = false;
-	lensDistortionData_->tightness = 2.5f;
-	lensDistortionData_->strength = -0.1f;
+	lensDistortionData_->enable = isLensDistortionActive;
+	lensDistortionData_->tightness = lensDistortionTightness;
+	lensDistortionData_->strength = lensDistortionStrength;
 	lensDistortionResource_->Unmap(0, nullptr);
-
-	//ビネット用のリソースの作成
-	vignetteResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataVignette));
 	//ビネットのリソースに書き込む
 	vignetteResource_->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData_));
-	vignetteData_->enable = false;
-	vignetteData_->intensity = 1.0f;
+	vignetteData_->enable = isVignetteActive;
+	vignetteData_->intensity = vignetteIntensity;
 	vignetteResource_->Unmap(0, nullptr);
 }
 
@@ -456,7 +493,6 @@ void PostProcess::CreateBlurPipelineStateObject() {
 	pixelShaderBlob->GetBufferSize() };//PixelShader
 	hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&verticalBlurPipelineState_));
 	assert(SUCCEEDED(hr));
-
 }
 
 void PostProcess::CreateFinalPassPipelineStateObject() {
@@ -504,21 +540,21 @@ void PostProcess::CreateFinalPassPipelineStateObject() {
 	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
-	rootParameters[5].Descriptor.ShaderRegister = 0;//レジスタ番号０とバインド
+	rootParameters[5].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
-	rootParameters[6].Descriptor.ShaderRegister = 1;//レジスタ番号０とバインド
+	rootParameters[6].Descriptor.ShaderRegister = 1;//レジスタ番号1とバインド
 	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
-	rootParameters[7].Descriptor.ShaderRegister = 2;//レジスタ番号０とバインド
+	rootParameters[7].Descriptor.ShaderRegister = 2;//レジスタ番号2とバインド
 	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
-	rootParameters[8].Descriptor.ShaderRegister = 3;//レジスタ番号０とバインド
+	rootParameters[8].Descriptor.ShaderRegister = 3;//レジスタ番号3とバインド
 	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderを使う
-	rootParameters[9].Descriptor.ShaderRegister = 4;//レジスタ番号０とバインド
-	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+	rootParameters[9].Descriptor.ShaderRegister = 4;//レジスタ番号4とバインド
+	descriptionRootSignature.pParameters = rootParameters;
+	descriptionRootSignature.NumParameters = _countof(rootParameters);
 	//Sampler
 	D3D12_STATIC_SAMPLER_DESC sampler{};
 	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//バイリニアフィルタ
@@ -529,8 +565,6 @@ void PostProcess::CreateFinalPassPipelineStateObject() {
 	sampler.MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipMapを使う
 	sampler.ShaderRegister = 0;
 	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = _countof(rootParameters);
 	descriptionRootSignature.NumStaticSamplers = 1;
 	descriptionRootSignature.pStaticSamplers = &sampler;
 	//シリアライズしてバイナリにする
@@ -632,6 +666,10 @@ uint32_t PostProcess::CreateMultiPassRenderTargetView(const Microsoft::WRL::ComP
 }
 
 void PostProcess::PreDraw() {
+	if (isActive == false) {
+		return;
+	}
+
 	//barrierを張る
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -663,6 +701,10 @@ void PostProcess::PreDraw() {
 }
 
 void PostProcess::PostDraw() {
+	if (isActive == false) {
+		return;
+	}
+
 	//barrierを張る
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -713,6 +755,9 @@ void PostProcess::PostDraw() {
 	PostProcess::Blur(verticalBlurPipelineState_, shrinkBlurSRVIndex_[0], highIntensityShrinkBlurSRVIndex_[0]);
 	//縦縮小ぼかし後処理
 	PostProcess::PostVerticalShrinkBlur();
+
+	//バックバッファをセット
+	dxCommon_->SetBackBuffer();
 }
 
 void PostProcess::PreSecondPassDraw() {
@@ -1040,8 +1085,6 @@ void PostProcess::PostVerticalShrinkBlur() {
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList_->ResourceBarrier(1, &barrier);
-	//バックバッファをセット
-	dxCommon_->SetBackBuffer();
 }
 
 void PostProcess::Blur(const Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipelineState, uint32_t blurSRVIndex, uint32_t highIntensityBlurSRVIndex) {
@@ -1066,6 +1109,10 @@ void PostProcess::Blur(const Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipeli
 }
 
 void PostProcess::Draw() {
+	if (isActive == false) {
+		return;
+	}
+
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	D3D12_VIEWPORT viewport;
 	viewport.Width = float(WinApp::GetInstance()->kClientWidth);

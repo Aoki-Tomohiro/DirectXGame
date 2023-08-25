@@ -67,6 +67,8 @@ void GameManager::run() {
 		input_->Update();
 		//ゲームシーンの更新
 		nowScene_->Update(this);
+		//ポストプロセスの更新
+		postProcess_->Update();
 		//ImGui受付終了
 		imguiManager_->End();
 

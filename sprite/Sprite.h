@@ -38,34 +38,6 @@ public:
 	static void Delete();
 
 	/// <summary>
-    /// DXCompilerの初期化
-    /// </summary>
-	static void InitializeDxcCompiler();
-
-	/// <summary>
-	/// シェーダーの読み込み
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="profile"></param>
-	/// <param name="dxcUtils"></param>
-	/// <param name="dxcCompiler"></param>
-	/// <param name="includeHandler"></param>
-	/// <returns></returns>
-	static IDxcBlob* CompileShader(//CompilerするShaderファイルへのパス
-		const std::wstring& filePath,
-		//compilerに使用するProfile
-		const wchar_t* profile,
-		//初期化で生成したものを3つ
-		IDxcUtils* dxcUtils,
-		IDxcCompiler3* dxcCompiler,
-		IDxcIncludeHandler* includeHandler);
-
-	/// <summary>
-	/// パイプラインステートの作成
-	/// </summary>
-	static void CreatePipelineStateObject();
-
-	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	Sprite();
@@ -83,11 +55,6 @@ public:
 	void Create(uint32_t textureHandle, Vector2 position);
 
 	/// <summary>
-	/// マッピング
-	/// </summary>
-	void Map();
-
-	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
@@ -101,7 +68,7 @@ public:
 	/// <summary>
 	/// 座標を取得
 	/// </summary>
-    /// <returns></returns>
+	/// <returns></returns>
 	const Vector2& GetTranslation() { return translation_; };
 
 	/// <summary>
@@ -175,6 +142,40 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	const Vector2 GetUVScale() { return uvScale_; };
+
+private:
+	/// <summary>
+    /// DXCompilerの初期化
+    /// </summary>
+	static void InitializeDxcCompiler();
+
+	/// <summary>
+	/// シェーダーの読み込み
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <param name="profile"></param>
+	/// <param name="dxcUtils"></param>
+	/// <param name="dxcCompiler"></param>
+	/// <param name="includeHandler"></param>
+	/// <returns></returns>
+	static IDxcBlob* CompileShader(//CompilerするShaderファイルへのパス
+		const std::wstring& filePath,
+		//compilerに使用するProfile
+		const wchar_t* profile,
+		//初期化で生成したものを3つ
+		IDxcUtils* dxcUtils,
+		IDxcCompiler3* dxcCompiler,
+		IDxcIncludeHandler* includeHandler);
+
+	/// <summary>
+	/// パイプラインステートの作成
+	/// </summary>
+	static void CreatePipelineStateObject();
+
+	/// <summary>
+	/// マッピング
+	/// </summary>
+	void Map();
 
 private:
 	//DXCompiler

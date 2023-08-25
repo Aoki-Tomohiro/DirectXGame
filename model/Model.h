@@ -40,6 +40,49 @@ public:
 	static void Delete();
 
 	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	Model();
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Model();
+
+	/// <summary>
+	/// モデルの作成
+	/// </summary>
+	void Create(const std::vector<VertexData>& vertices);
+
+	/// <summary>
+	/// OBJからモデルの作成
+	/// </summary>
+	void CreateFromOBJ(const std::string& directoryPath, const std::string& filename);
+
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
+
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle);
+
+	/// <summary>
+	/// マテリアルを取得
+	/// </summary>
+	/// <returns></returns>
+	Material* GetMaterial() { return material_.get(); };
+
+	/// <summary>
+	/// directionalLightを取得
+	/// </summary>
+	/// <returns></returns>
+	DirectionalLight* GetDirectionalLight() { return sDirectionalLight_.get(); };
+
+private:
+	/// <summary>
 	/// DXCompilerの初期化
 	/// </summary>
 	static void InitializeDxcCompiler();
@@ -68,26 +111,6 @@ public:
 	static void CreatePipelineStateObject();
 
 	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	Model();
-
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
-	~Model();
-
-	/// <summary>
-	/// モデルの作成
-	/// </summary>
-	void Create(const std::vector<VertexData>& vertices);
-
-	/// <summary>
-	/// OBJからモデルの作成
-	/// </summary>
-	void CreateFromOBJ(const std::string& directoryPath, const std::string& filename);
-
-	/// <summary>
 	/// Objファイルの読み込み
 	/// </summary>
 	/// <param name="directoryPath"></param>
@@ -102,28 +125,6 @@ public:
 	/// <param name="filename"></param>
 	/// <returns></returns>
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-
-	/// <summary>
-    /// 描画
-    /// </summary>
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
-
-	/// <summary>
-	/// 描画
-	/// </summary>
-	void Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle);
-
-	/// <summary>
-	/// マテリアルを取得
-	/// </summary>
-	/// <returns></returns>
-	Material* GetMaterial() { return material_.get(); };
-
-	/// <summary>
-	/// directionalLightを取得
-	/// </summary>
-	/// <returns></returns>
-	DirectionalLight* GetDirectionalLight() { return sDirectionalLight_.get(); };
 
 private:
 	//DXCompiler

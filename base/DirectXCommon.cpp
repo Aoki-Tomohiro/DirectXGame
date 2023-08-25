@@ -1,5 +1,4 @@
 #include "DirectXCommon.h"
-#include "TextureManager.h"
 
 DirectXCommon* DirectXCommon::instance = nullptr;
 uint32_t DirectXCommon::descriptorSizeRTV;
