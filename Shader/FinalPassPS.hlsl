@@ -1,6 +1,6 @@
 #include "FinalPass.hlsli"
 
-Texture2D<float> gLinearDepthTexture : register(t0);
+Texture2D<float32_t> gLinearDepthTexture : register(t0);
 Texture2D<float32_t4> gTexture : register(t1);
 Texture2D<float32_t4> gHighIntensityTexture : register(t2);
 Texture2D<float32_t4> gBlurTexture : register(t3);
@@ -22,7 +22,7 @@ struct PixelShaderOutput {
 PixelShaderOutput main(VertexShaderOutput input) {
 	PixelShaderOutput output;
 	//深度テクスチャ
-	float depthColor = gLinearDepthTexture.Sample(gSampler, input.texcoord);
+	float32_t depthColor = gLinearDepthTexture.Sample(gSampler, input.texcoord);
 	//通常テクスチャ
 	float32_t4 textureColor = gTexture.Sample(gSampler, input.texcoord);
 	//高輝度テクスチャ

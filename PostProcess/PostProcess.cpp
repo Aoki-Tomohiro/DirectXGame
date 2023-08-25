@@ -799,12 +799,12 @@ void PostProcess::PreHorizontalBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//通常横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(blurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -844,12 +844,12 @@ void PostProcess::PostHorizontalBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//通常横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(blurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -861,12 +861,12 @@ void PostProcess::PreVerticalBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//通常縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(blurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -906,12 +906,12 @@ void PostProcess::PostVerticalBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//通常縦テクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(blurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -923,12 +923,12 @@ void PostProcess::PreHorizontalShrinkBlur(){
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//縮小横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(shrinkBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縮小横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityShrinkBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -968,12 +968,12 @@ void PostProcess::PostHorizontalShrinkBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//縮小横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(shrinkBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縮小横ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityShrinkBlurSRVIndex_[0]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -985,12 +985,12 @@ void PostProcess::PreVerticalShrinkBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//縮小縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(shrinkBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縮小縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityShrinkBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -1030,12 +1030,12 @@ void PostProcess::PostVerticalShrinkBlur() {
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//通常テクスチャ
+	//縮小縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(shrinkBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	commandList_->ResourceBarrier(1, &barrier);
-	//高輝度テクスチャ
+	//高輝度縮小縦ぼかしテクスチャ
 	barrier.Transition.pResource = TextureManager::GetInstance()->GetTextureResource(highIntensityShrinkBlurSRVIndex_[1]).Get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -1053,8 +1053,9 @@ void PostProcess::Blur(const Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipeli
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//ディスクリプタヒープをセット
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
-	//テクスチャを設定
+	//ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(0, blurSRVIndex);
+	//高輝度ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(1, highIntensityBlurSRVIndex);
 	//CBVをセット
 	commandList_->SetGraphicsRootConstantBufferView(2, gaussianBlurResource_->GetGPUVirtualAddress());
@@ -1091,17 +1092,25 @@ void PostProcess::Draw() {
 	commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//ディスクリプタヒープをセット
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
-	//テクスチャを設定
+	//線形深度テクスチャ、通常テクスチャ、高輝度テクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(0, linearDepthSRVIndex_);
+	//ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(1, blurSRVIndex_[1]);
+	//高輝度ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, highIntensityBlurSRVIndex_[1]);
+	//縮小ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(3, shrinkBlurSRVIndex_[1]);
+	//高輝度縮小ぼかしテクスチャを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(4, highIntensityShrinkBlurSRVIndex_[1]);
-	//CBVを設定
+	//ブルームのリソースを設定
 	commandList_->SetGraphicsRootConstantBufferView(5, bloomResource_->GetGPUVirtualAddress());
+	//フォグ用のリソースを設定
 	commandList_->SetGraphicsRootConstantBufferView(6, fogResource_->GetGPUVirtualAddress());
+	//DoF用のリソースを設定
 	commandList_->SetGraphicsRootConstantBufferView(7, dofResource_->GetGPUVirtualAddress());
+	//レンズディストーション用のリソースを設定
 	commandList_->SetGraphicsRootConstantBufferView(8, lensDistortionResource_->GetGPUVirtualAddress());
+	//ビネット用のリソースを設定
 	commandList_->SetGraphicsRootConstantBufferView(9, vignetteResource_->GetGPUVirtualAddress());
 	//形状を設定
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

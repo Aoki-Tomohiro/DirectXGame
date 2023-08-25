@@ -23,15 +23,9 @@ void Model::Initialize() {
 }
 
 void Model::Delete() {
-	if (sDirectionalLight_ != nullptr) {
-		sDirectionalLight_->~DirectionalLight();
-	}
-	if (sPipelineState_ != nullptr) {
-		sPipelineState_.~ComPtr();
-	}
-	if (sRootSignature_ != nullptr) {
-		sRootSignature_.~ComPtr();
-	}
+	sDirectionalLight_.reset();
+	sPipelineState_.Reset();
+	sRootSignature_.Reset();
 }
 
 void Model::InitializeDxcCompiler() {

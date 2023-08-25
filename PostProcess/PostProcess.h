@@ -220,15 +220,8 @@ private:
 	uint32_t rtvIndex_ = -1;
 	//マルチパス用のDSVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> multiPassDSVDescriptorHeap_ = nullptr;
-
 	//マルチパス用の深度バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
-	//ブラー用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> gaussianBlurResource_ = nullptr;
-	//書き込み用
-	ConstBufferDataGaussianBlur* gaussianBlurData_ = nullptr;
-	//分散値
-	float s_ = 5.0f;
 
 	//一パス目のディスクリプタハンドル
 	uint32_t firstPassRTVIndex_ = 0;
@@ -255,6 +248,12 @@ private:
 	uint32_t highIntensityShrinkBlurRTVIndex_[2] = {};
 	uint32_t highIntensityShrinkBlurSRVIndex_[2] = {};
 
+	//ブラー用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> gaussianBlurResource_ = nullptr;
+	//書き込み用
+	ConstBufferDataGaussianBlur* gaussianBlurData_ = nullptr;
+	//分散値
+	float s_ = 5.0f;
 	//Bloom用のリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> bloomResource_ = nullptr;
 	//書き込み用

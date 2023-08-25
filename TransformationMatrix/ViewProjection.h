@@ -17,7 +17,7 @@ struct ViewProjection {
 	//Near
 	float nearClip_ = 0.1f;
 	//Far
-	float farClip_ = 1000.0f;
+	float farClip_ = 100.0f;
 
 	/// <summary>
 	/// 行列の計算

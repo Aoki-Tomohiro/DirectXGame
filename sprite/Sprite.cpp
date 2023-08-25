@@ -20,12 +20,8 @@ void Sprite::Initialize() {
 }
 
 void Sprite::Delete() {
-	if (sPipelineState_ != nullptr) {
-		sPipelineState_.~ComPtr();
-	}
-	if (sRootSignature_ != nullptr) {
-		sRootSignature_.~ComPtr();
-	}
+	sPipelineState_.Reset();
+	sRootSignature_.Reset();
 }
 
 void Sprite::InitializeDxcCompiler() {
