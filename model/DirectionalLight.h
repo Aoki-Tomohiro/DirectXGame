@@ -37,7 +37,6 @@ public:
 	void SetGraphicsCommand(UINT rootParameterIndex);
 
 private:
-	DirectXCommon* dxCommon_ = nullptr;
 	//ライティング用のリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightingResource_ = nullptr;
 	//書き込み用

@@ -15,7 +15,6 @@
 class DirectXCommon {
 public:
 	//インクリメントサイズ
-	static uint32_t descriptorSizeSRV;
 	static uint32_t descriptorSizeRTV;
 	static uint32_t descriptorSizeDSV;
 
@@ -86,16 +85,11 @@ public:
 	/// レンダーターゲットビューの作成
 	/// </summary>
 	void CreateRenderTargetView();
-
-	/// <summary>
-	/// マルチパス用のレンダーターゲットビューの作成
-	/// </summary>
-	uint32_t CreateMultiPassRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
 	
 	/// <summary>
 	/// 深度ステンシルビューの作成
 	/// </summary>
-	void CreateDepthStencilView();
+	void CreateDepthStencilView(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const Microsoft::WRL::ComPtr<ID3D12Resource>& resource);
 
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
@@ -114,6 +108,11 @@ public:
 	/// <param name="index"></param>
 	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const uint32_t descriptorSize, uint32_t index);
+
+	/// <summary>
+	/// バックバッファをセット
+	/// </summary>
+	void SetBackBuffer();
 
 	/// <summary>
 	/// 描画前処理
@@ -155,12 +154,6 @@ public:
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; };
 
-	/// <summary>
-	/// マルチパス用のRTVディスクリプタヒープを取得
-	/// </summary>
-	/// <returns></returns>
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetMultiPassRTVDescriptorHeap() { return multiPassRTVDescriptorHeap_; };
-
 private:
 	DirectXCommon() = default;
 	~DirectXCommon() = default;
@@ -198,7 +191,4 @@ private:
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	uint64_t fenceValue_ = 0;
-	//マルチパス用のRTVディスクリプタヒープ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> multiPassRTVDescriptorHeap_ = nullptr;
-	uint32_t rtvIndex_ = -1;
 };

@@ -11,6 +11,10 @@ public:
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandleSRV;
 	};
 
+	//インクリメントサイズ
+	static uint32_t descriptorSizeSRV;
+
+	//ディスクリプタヒープの最大数
 	static const size_t kNumDescriptors = 256;
 
 	/// <summary>
@@ -37,7 +41,7 @@ public:
 	/// <summary>
 	/// マルチパス用のテクスチャの作成
 	/// </summary>
-	uint32_t CreateMultiPassTexture(DXGI_FORMAT format, const float clearColor[]);
+	uint32_t CreateMultiPassTextureResource(uint32_t width, uint32_t height, DXGI_FORMAT format, const float clearColor[]);
 
 	/// <summary>
 	/// テクスチャリソースの作成
@@ -64,12 +68,14 @@ public:
     /// <param name="resource"></param>
     /// <param name="metadata"></param>
     /// <param name="index"></param>
-    void CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata);
+	void CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata, uint32_t srdIndex);
 
 	/// <summary>
 	/// マルチパス用のシェーダーリソースビューの作成
 	/// </summary>
-	void CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
+	/// <param name="resource"></param>
+	/// <param name="format"></param>
+	void CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format, uint32_t srvIndex);
 
 	/// <summary>
 	/// ディスクリプタヒープをセット
@@ -92,7 +98,9 @@ public:
 	/// <summary>
 	/// リソースを取得
 	/// </summary>
-	ID3D12Resource* GetTextureResource(uint32_t textureHandle) { return textures_[textureHandle].resource.Get(); };
+	/// <param name="textureHandle"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetTextureResource(uint32_t textureHandle) { return textures_[textureHandle].resource.Get(); };
 
 private:
 	TextureManager() = default;
@@ -101,7 +109,8 @@ private:
 	TextureManager& operator=(const TextureManager&) = delete;
 private:
 	static TextureManager* instance;
-	DirectXCommon* dxCommon_ = nullptr;
+	ID3D12Device* device_ = nullptr;
+	ID3D12GraphicsCommandList* commandList_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	std::array<Texture, kNumDescriptors> textures_;
 	uint32_t srvIndex_ = -1;

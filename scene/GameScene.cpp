@@ -34,7 +34,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	sprite_->Create(textureHandle_, translation_);
 	//モデルの作成
 	modelPlane_ = new Model();
-	modelPlane_->CreateFromOBJ("resources", "teapot.obj");
+	modelPlane_->CreateFromOBJ("resources", "plane.obj");
 	//衝突マネージャーの作成
 	collisionManager_ = new CollisionManager();
 	////再生
@@ -86,7 +86,7 @@ void GameScene::Update(GameManager* gameManager) {
 	}
 	//モデル
 	if (ImGui::TreeNode("Plane")) {
-		ImGui::DragFloat3("translate", &worldTransformPlane_.translation_.x, 0.01f);
+		ImGui::DragFloat3("translate", &worldTransformPlane_.translation_.x, 1.0f);
 		ImGui::DragFloat3("rotate", &worldTransformPlane_.rotation_.x, 0.01f);
 		ImGui::DragFloat3("scale", &worldTransformPlane_.scale_.x, 0.01f);
 		ImGui::TreePop();
@@ -102,8 +102,16 @@ void GameScene::Update(GameManager* gameManager) {
 };
 
 void GameScene::Draw(GameManager* gameManager) {
-	//モデルの描画
-	modelPlane_->Draw(worldTransformPlane_, viewProjection_);
 	//スプライトの描画
 	sprite_->Draw();
+
+#pragma region ポストプロセス
+	//ポストプロセスの描画前処理
+	postProcess_->PreDraw();
+	//モデルの描画
+	modelPlane_->Draw(worldTransformPlane_, viewProjection_);
+	//ポストプロセスの描画後処理
+	postProcess_->PostDraw();
+#pragma endregion
+
 };

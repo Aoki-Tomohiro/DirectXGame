@@ -2,6 +2,7 @@
 #include <cassert>
 
 TextureManager* TextureManager::instance = nullptr;
+uint32_t TextureManager::descriptorSizeSRV;
 
 TextureManager* TextureManager::GetInstance() {
 	if (instance == nullptr) {
@@ -16,8 +17,10 @@ void TextureManager::DeleteInstance() {
 }
 
 void TextureManager::Initialize() {
-	dxCommon_ = DirectXCommon::GetInstance();
-	srvDescriptorHeap_ = dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNumDescriptors, true);
+	device_ = DirectXCommon::GetInstance()->GetDevice().Get();
+	commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
+	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	srvDescriptorHeap_ = DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNumDescriptors, true);
 }
 
 uint32_t TextureManager::Load(const std::string& filePath) {
@@ -25,7 +28,7 @@ uint32_t TextureManager::Load(const std::string& filePath) {
 	srvIndex_++;
 	//テクスチャファイルを読んでプログラムを扱えるようにする
 	DirectX::ScratchImage image{};
-	std::wstring filePathW = dxCommon_->GetWinApp()->ConvertString(filePath);
+	std::wstring filePathW = WinApp::GetInstance()->ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 	//ミップマップの作成
@@ -40,18 +43,18 @@ uint32_t TextureManager::Load(const std::string& filePath) {
 	textures_[srvIndex_].intermediateResource = TextureManager::UploadTextureData(textures_[srvIndex_].resource, mipImages);
 
 	//SRVの作成
-	TextureManager::CreateShaderResourceView(textures_[srvIndex_].resource, metadata);
+	TextureManager::CreateShaderResourceView(textures_[srvIndex_].resource, metadata, srvIndex_);
 
 	return srvIndex_;
 }
 
-uint32_t TextureManager::CreateMultiPassTexture(DXGI_FORMAT format,const float clearColor[]) {
+uint32_t TextureManager::CreateMultiPassTextureResource(uint32_t width, uint32_t height, DXGI_FORMAT format, const float clearColor[]) {
 	//srvIndexをインクリメント
 	srvIndex_++;
 	//マルチパス用のリソースを作成
-	textures_[srvIndex_].resource = TextureManager::CreateMultiPassResource(WinApp::GetInstance()->kClientWidth, WinApp::GetInstance()->kClientHeight, format, clearColor);
+	textures_[srvIndex_].resource = TextureManager::CreateMultiPassResource(width, height, format, clearColor);
 	//マルチパス用のSRVの作成
-	TextureManager::CreateMultiPassShaderResourceView(textures_[srvIndex_].resource, format);
+	TextureManager::CreateMultiPassShaderResourceView(textures_[srvIndex_].resource, format, srvIndex_);
 
 	return srvIndex_;
 }
@@ -75,7 +78,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateTextureResource(con
 
 	//Resourceの生成
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = dxCommon_->GetDevice()->CreateCommittedResource(
+	HRESULT hr = device_->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -103,7 +106,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateMultiPassResource(i
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	//ClearValue
 	D3D12_CLEAR_VALUE clearValue;
-	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearValue.Format = format;
 	clearValue.Color[0] = clearColor[0];
 	clearValue.Color[1] = clearColor[1];
 	clearValue.Color[2] = clearColor[2];
@@ -111,7 +114,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateMultiPassResource(i
 
 	//リソースの作成
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = dxCommon_->GetDevice()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
+	HRESULT hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue,
 		IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
@@ -122,10 +125,10 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::CreateMultiPassResource(i
 [[nodiscard]]
 Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages) {
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-	DirectX::PrepareUpload(dxCommon_->GetDevice().Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+	DirectX::PrepareUpload(device_, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->CreateBufferResource(intermediateSize);
-	UpdateSubresources(dxCommon_->GetCommandList().Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = DirectXCommon::GetInstance()->CreateBufferResource(intermediateSize);
+	UpdateSubresources(commandList_, texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
 	//Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -134,11 +137,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureManager::UploadTextureData(const M
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	dxCommon_->GetCommandList()->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier);
 	return intermediateResource;
 }
 
-void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata) {
+void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, const DirectX::TexMetadata& metadata, uint32_t srvIndex) {
 	//metadataを基にSRVを設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
@@ -147,13 +150,13 @@ void TextureManager::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D1
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	textures_[srvIndex_].cpuHandleSRV = dxCommon_->GetCPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
-	textures_[srvIndex_].gpuHandleSRV = dxCommon_->GetGPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	textures_[srvIndex].cpuHandleSRV = DirectXCommon::GetInstance()->GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, srvIndex);
+	textures_[srvIndex].gpuHandleSRV = DirectXCommon::GetInstance()->GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, srvIndex);
 	//SRVを作成
-	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
+	device_->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex].cpuHandleSRV);
 }
 
-void TextureManager::CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
+void TextureManager::CreateMultiPassShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format, uint32_t srvIndex) {
 	//SRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -162,21 +165,21 @@ void TextureManager::CreateMultiPassShaderResourceView(const Microsoft::WRL::Com
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	textures_[srvIndex_].cpuHandleSRV = dxCommon_->GetCPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
-	textures_[srvIndex_].gpuHandleSRV = dxCommon_->GetGPUDescriptorHandle(srvDescriptorHeap_, dxCommon_->descriptorSizeSRV, srvIndex_);
+	textures_[srvIndex].cpuHandleSRV = DirectXCommon::GetInstance()->GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, srvIndex);
+	textures_[srvIndex].gpuHandleSRV = DirectXCommon::GetInstance()->GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV, srvIndex);
 	//SRVを作成
-	dxCommon_->GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex_].cpuHandleSRV);
+	device_->CreateShaderResourceView(resource.Get(), &srvDesc, textures_[srvIndex].cpuHandleSRV);
 }
 
 void TextureManager::SetGraphicsDescriptorHeap() {
 	//ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get() };
-	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+	commandList_->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 }
 
 void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t textureHandle) {
 	//ディスクリプタテーブルをセット
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].gpuHandleSRV);
+	commandList_->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].gpuHandleSRV);
 }
 
 D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {

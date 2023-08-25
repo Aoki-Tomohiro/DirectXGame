@@ -29,7 +29,7 @@ public:
 	/// <summary>
 	/// マッピングする
 	/// </summary>
-	void Map(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
+	void Update(const WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// グラフィックスコマンドのセット
@@ -37,7 +37,6 @@ public:
 	void SetGraphicsCommand(UINT rootParameterIndex);
 
 private:
-	DirectXCommon* dxCommon_ = nullptr;
 	//WVPResource
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	//書き込み用

@@ -17,13 +17,12 @@ void ImGuiManager::DeleteInstance() {
 }
 
 void ImGuiManager::Initialize() {
-	winApp_ = WinApp::GetInstance();
 	dxCommon_ = DirectXCommon::GetInstance();
 	srvDescriptorHeap_ = dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp_->GetHwnd());
+	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 	ImGui_ImplDX12_Init(dxCommon_->GetDevice().Get(), dxCommon_->GetSwapChainDesc().BufferCount,
 		dxCommon_->GetRenderTargetViewDesc().Format, srvDescriptorHeap_.Get(),
 		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),

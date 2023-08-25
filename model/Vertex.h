@@ -33,7 +33,6 @@ public:
 	void Draw();
 
 private:
-	DirectXCommon* dxCommon_ = nullptr;
 	//VertexBuffer
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_ = nullptr;
 	//VertexBufferView

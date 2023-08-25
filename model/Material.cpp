@@ -5,9 +5,8 @@ Material::Material() {};
 Material::~Material() {};
 
 void Material::Create() {
-	dxCommon_ = DirectXCommon::GetInstance();
 	//マテリアルリソースの作成
-	materialResource_ = dxCommon_->CreateBufferResource(sizeof(ConstBufferDataMaterial));
+	materialResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ConstBufferDataMaterial));
 	//マテリアルリソースに書き込む
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;
@@ -34,5 +33,5 @@ void Material::Update() {
 
 void Material::SetGraphicsCommand(UINT rootParameterIndex) {
 	//マテリアルリソースの場所を設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, materialResource_->GetGPUVirtualAddress());
+	DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, materialResource_->GetGPUVirtualAddress());
 }

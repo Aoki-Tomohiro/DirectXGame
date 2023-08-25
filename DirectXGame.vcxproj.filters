@@ -294,7 +294,16 @@
     <None Include="shader\Sprite.hlsli">
       <Filter>shader</Filter>
     </None>
+    <None Include="Shader\SecondPass.hlsli">
+      <Filter>shader</Filter>
+    </None>
     <None Include="Shader\FinalPass.hlsli">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="Shader\HorizontalBlur.hlsli">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="Shader\VerticalBlur.hlsli">
       <Filter>shader</Filter>
     </None>
   </ItemGroup>
@@ -311,10 +320,28 @@
     <FxCompile Include="shader\SpriteVS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\SecondPassVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\SecondPassPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
     <FxCompile Include="Shader\FinalPassVS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="Shader\FinalPassPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\HorizontalBlurPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\HorizontalBlurVS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\VerticalBlurPS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\VerticalBlurVS.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

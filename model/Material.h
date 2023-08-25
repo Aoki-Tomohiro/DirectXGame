@@ -45,7 +45,6 @@ public:
 	void SetGraphicsCommand(UINT rootParameterIndex);
 
 private:
-	DirectXCommon* dxCommon_ = nullptr;
 	//マテリアル用のリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	//書き込み用

@@ -2,7 +2,6 @@
 #include "TextureManager.h"
 
 DirectXCommon* DirectXCommon::instance = nullptr;
-uint32_t DirectXCommon::descriptorSizeSRV;
 uint32_t DirectXCommon::descriptorSizeRTV;
 uint32_t DirectXCommon::descriptorSizeDSV;
 
@@ -22,6 +21,9 @@ void DirectXCommon::Initialize() {
 	winApp_ = WinApp::GetInstance();
 	//DXGIDeviceの作成
 	DirectXCommon::CreateDXGIDevice();
+	//インクリメントサイズの初期化
+	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	//コマンドを作成
 	DirectXCommon::CreateCommand();
 	//スワップチェーンを作成
@@ -35,9 +37,7 @@ void DirectXCommon::Initialize() {
 	depthStencilResource_ = DirectXCommon::CreateDepthStencilTextureResource(winApp_->kClientWidth, winApp_->kClientHeight);
 	//ビューの作成
 	DirectXCommon::CreateRenderTargetView();
-	DirectXCommon::CreateDepthStencilView();
-	//マルチパス用のディスクリプタヒープの作成
-	multiPassRTVDescriptorHeap_ = DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	DirectXCommon::CreateDepthStencilView(dsvDescriptorHeap_, depthStencilResource_);
 }
 
 void DirectXCommon::CreateDXGIDevice() {
@@ -97,11 +97,6 @@ void DirectXCommon::CreateDXGIDevice() {
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device_ != nullptr);
 	winApp_->Log("Complete create D3D12Device!!!\n"); //初期化完了のログを出す
-
-	//インクリメントサイズの初期化
-	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
@@ -264,27 +259,14 @@ void DirectXCommon::CreateRenderTargetView() {
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles[1]);
 }
 
-uint32_t DirectXCommon::CreateMultiPassRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
-	rtvIndex_++;
-	//RTVの設定
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	rtvDesc.Format = format;
-	//一パス目用RTVの作成
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPUDescriptorHandle(multiPassRTVDescriptorHeap_, descriptorSizeRTV, rtvIndex_);
-	device_->CreateRenderTargetView(resource.Get(), &rtvDesc, rtvHandle);
-
-	return rtvIndex_;
-}
-
-void DirectXCommon::CreateDepthStencilView() {
+void DirectXCommon::CreateDepthStencilView(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const Microsoft::WRL::ComPtr<ID3D12Resource>& resource) {
 	//DSVの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	//dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//Format。基本的にはResourceに合わせる
 	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;//Format。基本的にはResourceに合わせる
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2DTexture
 	//DSVHeapの先端にDSVを作る
-	device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+	device_->CreateDepthStencilView(resource.Get(), &dsvDesc, descriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, const uint32_t descriptorSize, uint32_t index) {
@@ -297,6 +279,19 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(const Microsof
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
+}
+
+void DirectXCommon::SetBackBuffer() {
+	//これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	//RTV用ディスクリプタヒープのハンドルを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap_, descriptorSizeRTV, 0);
+	rtvHandles[1] = GetCPUDescriptorHandle(rtvDescriptorHeap_, descriptorSizeRTV, 1);
+	//DSV用ディスクリプターのハンドルを取得
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_, descriptorSizeDSV, 0);
+	//描画先のRTVを設定する
+	commandList_->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 }
 
 void DirectXCommon::PreDraw() {

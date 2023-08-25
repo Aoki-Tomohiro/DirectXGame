@@ -18,5 +18,10 @@ VertexShaderOutput main(VertexShaderInput input) {
 	output.position = mul(input.position, gTransformationMatrix.WVP);
 	output.texcoord = input.texcoord;
 	output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.World));
+
+	//線形深度
+	float z = (output.position.z - 0.1f) / (100.0f - 0.1f);
+	output.depth = float32_t4(z, 0.0f, 0.0f, 0.0f);
+
 	return output;
 }

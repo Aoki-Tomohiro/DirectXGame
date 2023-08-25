@@ -209,9 +209,9 @@ void Sprite::CreatePipelineStateObject() {
 	pixelShaderBlob->GetBufferSize() };//PixelShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
-	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	////graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	//書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;

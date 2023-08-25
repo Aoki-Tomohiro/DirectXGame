@@ -220,12 +220,13 @@ void Model::CreatePipelineStateObject() {
 	pixelShaderBlob->GetBufferSize() };//PixelShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
-	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	////graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
+	graphicsPipelineStateDesc.NumRenderTargets = 2;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDesc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
 	//利用するトポロジ(形状)のタイプ。三角形
 	graphicsPipelineStateDesc.PrimitiveTopologyType =
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -362,6 +363,8 @@ Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directory
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection) {
+	//行列を計算する
+	transformationMatrix_->Update(worldTransform, viewProjection);
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	D3D12_VIEWPORT viewport;
 	viewport.Width = float(WinApp::GetInstance()->kClientWidth);
@@ -380,8 +383,6 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	scissorRect.bottom = LONG(WinApp::GetInstance()->kClientHeight);
 	//ScissorRectを設定
 	sCommandList_->RSSetScissorRects(1, &scissorRect);
-	//行列をマッピングする
-	transformationMatrix_->Map(worldTransform, viewProjection);
 	//RootSignatureを設定
 	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
 	//PSOを設定
@@ -401,6 +402,8 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 }
 
 void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle) {
+	//行列を計算する
+	transformationMatrix_->Update(worldTransform, viewProjection);
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	D3D12_VIEWPORT viewport;
 	viewport.Width = float(WinApp::GetInstance()->kClientWidth);
@@ -419,8 +422,6 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	scissorRect.bottom = LONG(WinApp::GetInstance()->kClientHeight);
 	//ScissorRectを設定
 	sCommandList_->RSSetScissorRects(1, &scissorRect);
-	//行列をマッピングする
-	transformationMatrix_->Map(worldTransform, viewProjection);
 	//RootSignatureを設定
 	sCommandList_->SetGraphicsRootSignature(sRootSignature_.Get());
 	//PSOを設定

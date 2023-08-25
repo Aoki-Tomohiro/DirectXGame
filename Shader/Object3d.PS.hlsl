@@ -19,6 +19,7 @@ SamplerState gSampler : register(s0);
 
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
+	float32_t4 depth : SV_TARGET1;
 };
 
 PixelShaderOutput main(VertexShaderOutput input) {
@@ -34,5 +35,9 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	else {
 		output.color = gMaterial.color * textureColor;
 	}
+
+	//線形深度
+	output.depth = input.depth.x;
+
 	return output;
 }

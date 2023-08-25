@@ -1,5 +1,4 @@
 #pragma once
-#include "WinApp.h"
 #include "DirectXCommon.h"
 #include "imgui.h"
 
@@ -48,7 +47,6 @@ private:
 	const ImGuiManager& operator = (const ImGuiManager&) = delete;
 private:
 	static ImGuiManager* instance;
-	WinApp* winApp_ = nullptr;
 	DirectXCommon* dxCommon_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
 };

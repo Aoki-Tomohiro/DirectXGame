@@ -70,15 +70,10 @@ void GameManager::run() {
 		//ImGui受付終了
 		imguiManager_->End();
 
-		//ポストプロセスの描画前処理
-		postProcess_->PreDraw();
-		//ゲームシーンの描画
-		nowScene_->Draw(this);
-		//ポストプロセスの描画後処理
-		postProcess_->PostDraw();
-
 		//描画開始
 		dxCommon_->PreDraw();
+		//ゲームシーンの描画
+		nowScene_->Draw(this);
 		//ポストプロセスの描画
 		postProcess_->Draw();
 		//ImGuiの描画
