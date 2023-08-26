@@ -30,13 +30,13 @@ GameManager::GameManager() {
 	//スプライトの初期化
 	Sprite::Initialize();
 	//シーンの初期化
-	nowScene_ = new GameScene();
-	nowScene_->Initialize(this);
+	currentScene_ = new GameScene();
+	currentScene_->Initialize(this);
 }
 
 GameManager::~GameManager() {
-	delete nowScene_;
-	nowScene_ = nullptr;
+	delete currentScene_;
+	currentScene_ = nullptr;
 	Sprite::Delete();
 	Model::Delete();
 	PostProcess::DeleteInstance();
@@ -49,9 +49,9 @@ GameManager::~GameManager() {
 }
 
 void GameManager::ChangeScene(IScene* newScene) {
-	nowScene_ = nullptr;
-	nowScene_ = newScene;
-	nowScene_->Initialize(this);
+	currentScene_ = nullptr;
+	currentScene_ = newScene;
+	currentScene_->Initialize(this);
 }
 
 void GameManager::run() {
@@ -66,7 +66,7 @@ void GameManager::run() {
 		//Inputの更新
 		input_->Update();
 		//ゲームシーンの更新
-		nowScene_->Update(this);
+		currentScene_->Update(this);
 		//ポストプロセスの更新
 		postProcess_->Update();
 		//ImGui受付終了
@@ -75,7 +75,7 @@ void GameManager::run() {
 		//描画開始
 		dxCommon_->PreDraw();
 		//ゲームシーンの描画
-		nowScene_->Draw(this);
+		currentScene_->Draw(this);
 		//ポストプロセスの描画
 		postProcess_->Draw();
 		//ImGuiの描画

@@ -91,6 +91,13 @@ void GameScene::Update(GameManager* gameManager) {
 		ImGui::DragFloat3("scale", &worldTransformPlane_.scale_.x, 0.01f);
 		ImGui::TreePop();
 	}
+	//ポストプロセス
+	ImGui::Checkbox("PostProcess", &postProcess_->isActive);
+	ImGui::Checkbox("Bloom", &postProcess_->isBloomActive);
+	ImGui::Checkbox("Fog", &postProcess_->isFogActive);
+	ImGui::Checkbox("DoF", &postProcess_->isDofActive);
+	ImGui::Checkbox("LensDistortion", &postProcess_->isLensDistortionActive);
+	ImGui::Checkbox("Vignette", &postProcess_->isVignetteActive);
 	//デバッグカメラ
 	ImGui::Checkbox("DebugCamera", &isDebugCameraActive_);
 	ImGui::Text("1 : DebugCamera");

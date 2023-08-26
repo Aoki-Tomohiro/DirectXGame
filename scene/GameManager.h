@@ -43,5 +43,5 @@ private:
 	Audio* audio_ = nullptr;
 	Input* input_ = nullptr;
 	PostProcess* postProcess_ = nullptr;
-	IScene* nowScene_;
+	IScene* currentScene_;
 };

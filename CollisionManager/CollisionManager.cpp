@@ -30,8 +30,8 @@ void CollisionManager::CheckAllCollisions() {
 
 void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	//衝突フィルタリング
-	if (colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask() ||
-		colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask()) {
+	if ((colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask()) == 0 ||
+		(colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask()) == 0) {
 		return;
 	}
 	//コライダーAのワールド座標を取得
