@@ -483,7 +483,7 @@ void Model::Draw(const WorldTransform& worldTransform, const ViewProjection& vie
 	//ディスクリプタヒープをセット
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//テクスチャを設定
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(UINT(RootParameterIndex::Texture), textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(UINT(RootParameterIndex::Texture), textureHandle);
 	//directionalLightを設定
 	directionalLight_->SetGraphicsCommand(UINT(RootParameterIndex::DirectionalLight));
 	//描画

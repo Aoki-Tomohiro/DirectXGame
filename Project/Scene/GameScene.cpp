@@ -35,8 +35,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	sprite_->Create(textureHandle_, translation_);
 	//モデルの作成
 	modelPlane_ = new Model();
-	/*modelPlane_->CreateFromOBJ("Project/Resources", "plane.obj");*/
-	modelPlane_->CreateSphere();
+	modelPlane_->CreateFromOBJ("Project/Resources", "plane.obj");
 	//衝突マネージャーの作成
 	collisionManager_ = new CollisionManager();
 	//再生
@@ -119,7 +118,7 @@ void GameScene::Draw(GameManager* gameManager) {
 	//ポストプロセスの描画前処理
 	postProcess_->PreDraw();
 	//モデルの描画
-	modelPlane_->Draw(worldTransformPlane_, viewProjection_, textureHandle_);
+	modelPlane_->Draw(worldTransformPlane_, viewProjection_);
 	//ポストプロセスの描画後処理
 	postProcess_->PostDraw();
 #pragma endregion
