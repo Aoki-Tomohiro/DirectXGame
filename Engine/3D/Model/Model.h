@@ -45,6 +45,11 @@ public:
 	void Create(const std::vector<VertexData>& vertices);
 
 	/// <summary>
+	/// 球の作成
+	/// </summary>
+	void CreateSphere();
+
+	/// <summary>
 	/// OBJからモデルの作成
 	/// </summary>
 	void CreateFromOBJ(const std::string& directoryPath, const std::string& filename);

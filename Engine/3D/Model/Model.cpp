@@ -231,6 +231,70 @@ void Model::Create(const std::vector<VertexData>& vertices) {
 	transformationMatrix_->Initialize();
 }
 
+void Model::CreateSphere() {
+	//DxcCompilerの初期化
+	Model::InitializeDxcCompiler();
+	//パイプラインステートの作成
+	Model::CreatePipelineStateObject();
+	//コマンドリストを取得
+	commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
+	//DirectionalLightの作成
+	directionalLight_ = std::make_unique<DirectionalLight>();
+	directionalLight_->Initialize();
+	//メッシュの作成
+	std::vector<VertexData> vertices{};
+	const float pi = 3.14f;
+	const uint32_t kSubdivision = 16;
+	uint32_t latIndex = 0;
+	uint32_t lonIndex = 0;
+	//経度分割一つ分の角度φd
+	const float kLonEvery = pi * 2.0f / float(kSubdivision);
+	//緯度分割一つ分の角度θd
+	const float kLatEvery = pi / float(kSubdivision);
+	//緯度の方向に分割
+	for (latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -pi / 2.0f + kLatEvery * latIndex;//θ
+		//経度の方向に分割しながら線を描く
+		for (lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+			float lon = lonIndex * kLonEvery;//φ
+			//頂点にデータを入力する。基準点a
+			vertices.push_back(VertexData{ {std::cos(lat) * std::cos(lon),std::sin(lat),std::cos(lat) * std::sin(lon),1.0f},
+				{ float(lonIndex) / float(kSubdivision),1.0f - float(latIndex) / float(kSubdivision)},
+				{std::cos(lat) * std::cos(lon),std::sin(lat),std::cos(lat) * std::sin(lon)} });
+
+			//残りの５頂点も順番に計算して入力していく
+			vertices.push_back(VertexData{ {std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon),1.0f},
+				{float(lonIndex) / float(kSubdivision),1.0f - float(latIndex + 1) / float(kSubdivision)},
+				{std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon)} });
+
+			vertices.push_back(VertexData{ {std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery),1.0f},
+				{float(lonIndex + 1) / float(kSubdivision),1.0f - float(latIndex) / float(kSubdivision)},
+				{std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery)} });
+
+			vertices.push_back(VertexData{ { std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery),1.0f},
+				{float(lonIndex + 1) / float(kSubdivision),1.0f - float(latIndex) / float(kSubdivision)},
+				{std::cos(lat) * std::cos(lon + kLonEvery),std::sin(lat),std::cos(lat) * std::sin(lon + kLonEvery)} });
+
+			vertices.push_back(VertexData{ {std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon),1.0f},
+				{float(lonIndex) / float(kSubdivision),1.0f - float(latIndex + 1) / float(kSubdivision)},
+				{std::cos(lat + kLatEvery) * std::cos(lon),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon)} });
+
+			vertices.push_back(VertexData{ {std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery),1.0f},
+				{float(lonIndex + 1) / float(kSubdivision),1.0f - float(latIndex + 1) / float(kSubdivision)},
+				{std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery)} });
+		}
+	}
+	vertex_ = std::make_unique<Vertex>();
+	vertex_->Create(vertices);
+	//マテリアルの作成
+	material_ = std::make_unique<Material>();
+	material_->Create();
+	//行列の作成
+	transformationMatrix_ = std::make_unique<TransformationMatrix>();
+	transformationMatrix_->Initialize();
+}
+
 void Model::CreateFromOBJ(const std::string& directoryPath, const std::string& filename) {
 	//DxcCompilerの初期化
 	Model::InitializeDxcCompiler();
