@@ -153,6 +153,9 @@
     <ClCompile Include="Project\Scene\TitleScene.cpp">
       <Filter>ソース ファイル\Project\Game</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\2D\GlobalVariables\GlobalVariables.cpp">
+      <Filter>ソース ファイル\Engine\2D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Base\DirectXCommon\DirectXCommon.h">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="Project\Scene\GameManager.h">
       <Filter>ヘッダー ファイル\Project\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\2D\GlobalVariables\GlobalVariables.h">
+      <Filter>ヘッダー ファイル\Engine\2D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

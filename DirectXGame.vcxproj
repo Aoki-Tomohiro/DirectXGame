@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -90,6 +90,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\2D\GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Engine\2D\ImGuiManager\ImGuiManager.cpp" />
     <ClCompile Include="Engine\2D\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\3D\DebugCamera\DebugCamera.cpp" />
@@ -120,6 +121,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Project\Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\2D\GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Engine\2D\ImGuiManager\ImGuiManager.h" />
     <ClInclude Include="Engine\2D\Sprite\Sprite.h" />
     <ClInclude Include="Engine\3D\DebugCamera\DebugCamera.h" />

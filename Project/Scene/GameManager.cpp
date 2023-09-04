@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include "TitleScene.h"
 #include "GameScene.h"
+#include "GlobalVariables/GlobalVariables.h"
 
 GameManager::GameManager() {
 	//ゲームウィンドウ作成
@@ -58,6 +59,8 @@ void GameManager::run() {
 		imguiManager_->Begin();
 		//Inputの更新
 		input_->Update();
+		//グローバル変数の更新
+		GlobalVariables::GetInstance()->Update();
 		//ゲームシーンの更新
 		currentScene_->Update(this);
 		//ポストプロセスの更新
