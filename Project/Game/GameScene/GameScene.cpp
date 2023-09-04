@@ -24,7 +24,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	//デバッグカメラの生成
 	debugCamera_ = new DebugCamera();
 	//追従対象の設定
-	//debugCamera_->SetTarget(&worldTransformPlane_);
+	debugCamera_->SetTarget(&worldTransformPlane_);
 	//画像読み込み
 	textureHandle_ = textureManager_->Load("Project/Resources/uvChecker.png");
 	//音声データ読み込み
