@@ -39,7 +39,7 @@ void GameScene::Initialize(GameManager* gameManager) {
 	//衝突マネージャーの作成
 	collisionManager_ = new CollisionManager();
 	//再生
-	audio_->SoundPlayWave(audioHandle_, true);
+	audio_->SoundPlayWave(audioHandle_, false);
 	//audio_->SoundPlayWave(audioHandle2_, true);
 };
 
@@ -70,11 +70,9 @@ void GameScene::Update(GameManager* gameManager) {
 	if (input_->IsPushKeyEnter(DIK_1)) {
 		if (isDebugCameraActive_ == false) {
 			isDebugCameraActive_ = true;
-			audio_->StopAudio(audioHandle_);
 		}
 		else {
 			isDebugCameraActive_ = false;
-			audio_->SoundPlayWave(audioHandle_, true);
 		}
 	}
 	//ビュープロジェクションの更新
