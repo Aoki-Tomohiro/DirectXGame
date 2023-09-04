@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXCommon/DirectXCommon.h"
-#include "Math/MathFunction.h"
+#include "MathFunction.h"
 
 struct VertexData {
 	Vector4 position;
@@ -8,17 +8,17 @@ struct VertexData {
 	Vector3 normal;
 };
 
-class Vertex {
+class Mesh {
 public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	Vertex();
+	Mesh();
 
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Vertex();
+	~Mesh();
 
 	/// <summary>
 	/// メッシュの作成

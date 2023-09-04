@@ -1,7 +1,7 @@
 #pragma once
 #include "DirectXCommon/DirectXCommon.h"
 #include "TextureManager/TextureManager.h"
-#include "Math/MathFunction.h"
+#include "MathFunction.h"
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 

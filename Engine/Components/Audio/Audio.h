@@ -91,7 +91,7 @@ public:
 	/// </summary>
 	/// <param name="xAudio2"></param>
 	/// <param name="soundData"></param>
-	void SoundPlayWave(uint32_t audioHandle, bool roop);
+	void SoundPlayWave(uint32_t audioHandle, bool roopFlag);
 
 private:
 	Audio() = default;

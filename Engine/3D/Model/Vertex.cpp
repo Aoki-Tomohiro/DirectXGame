@@ -1,10 +1,10 @@
 #include "Vertex.h"
 
-Vertex::Vertex() {}
+Mesh::Mesh() {}
 
-Vertex::~Vertex() {};
+Mesh::~Mesh() {};
 
-void Vertex::Create(const std::vector<VertexData>& vertices) {
+void Mesh::Create(const std::vector<VertexData>& vertices) {
 	//頂点情報を取得
 	vertices_ = vertices;
 	//頂点バッファを作成
@@ -19,7 +19,7 @@ void Vertex::Create(const std::vector<VertexData>& vertices) {
 	vertexBuffer_->Unmap(0, nullptr);
 }
 
-void Vertex::Draw() {
+void Mesh::Draw() {
 	//VBVを設定
 	DirectXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定

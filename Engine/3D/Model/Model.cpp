@@ -221,7 +221,7 @@ void Model::Create(const std::vector<VertexData>& vertices) {
 	directionalLight_ = std::make_unique<DirectionalLight>();
 	directionalLight_->Initialize();
 	//メッシュの作成
-	vertex_ = std::make_unique<Vertex>();
+	vertex_ = std::make_unique<Mesh>();
 	vertex_->Create(vertices);
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();
@@ -285,7 +285,7 @@ void Model::CreateSphere() {
 				{std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery),std::sin(lat + kLatEvery),std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery)} });
 		}
 	}
-	vertex_ = std::make_unique<Vertex>();
+	vertex_ = std::make_unique<Mesh>();
 	vertex_->Create(vertices);
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();
@@ -308,7 +308,7 @@ void Model::CreateFromOBJ(const std::string& directoryPath, const std::string& f
 	//モデルの読み込み
 	modelData_ = Model::LoadObjFile(directoryPath, filename);
 	//メッシュの作成
-	vertex_ = std::make_unique<Vertex>();
+	vertex_ = std::make_unique<Mesh>();
 	vertex_->Create(modelData_.vertices);
 	//マテリアルの作成
 	material_ = std::make_unique<Material>();

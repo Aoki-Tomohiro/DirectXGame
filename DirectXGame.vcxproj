@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;$(ProjectDir)Project/Game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine;$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine/Base;$(ProjectDir)Engine/Components;$(ProjectDir)Engine/3D;$(ProjectDir)Engine/2D;$(ProjectDir)Engine/Math;$(ProjectDir)Engine/Externals/DirectXTex;$(ProjectDir)Engine/Externals/imgui;$(ProjectDir)Engine/Externals/nlohmann;$(ProjectDir)Project/Game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -116,9 +116,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Math\MathFunction.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Project\Scene\GameManager.cpp" />
-    <ClCompile Include="Project\Scene\GameScene.cpp" />
-    <ClCompile Include="Project\Scene\TitleScene.cpp" />
+    <ClCompile Include="Project\Game\GameManager\GameManager.cpp" />
+    <ClCompile Include="Project\Game\GameScene\GameScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\2D\GlobalVariables\GlobalVariables.h" />
@@ -148,10 +147,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="Engine\Externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\Math\MathFunction.h" />
-    <ClInclude Include="Project\Scene\GameManager.h" />
-    <ClInclude Include="Project\Scene\GameScene.h" />
-    <ClInclude Include="Project\Scene\IScene.h" />
-    <ClInclude Include="Project\Scene\TitleScene.h" />
+    <ClInclude Include="Project\Game\GameManager\GameManager.h" />
+    <ClInclude Include="Project\Game\GameManager\IScene.h" />
+    <ClInclude Include="Project\Game\GameScene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Project\Resources\Shader\FinalPass.hlsli">

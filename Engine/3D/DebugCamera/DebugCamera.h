@@ -2,7 +2,7 @@
 #include "Input/Input.h"
 #include "TransformationMatrix/WorldTransform.h"
 #include "TransformationMatrix/ViewProjection.h"
-#include "Math/MathFunction.h"
+#include "MathFunction.h"
 
 class DebugCamera{
 public:

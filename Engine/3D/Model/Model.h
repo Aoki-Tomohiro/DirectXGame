@@ -137,7 +137,7 @@ private:
 	//モデルデータ
 	ModelData modelData_;
 	//メッシュ
-	std::unique_ptr<Vertex> vertex_ = nullptr;
+	std::unique_ptr<Mesh> vertex_ = nullptr;
 	//マテリアル
 	std::unique_ptr<Material> material_ = nullptr;
 	//行列

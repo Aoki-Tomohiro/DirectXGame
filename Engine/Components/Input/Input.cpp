@@ -50,38 +50,40 @@ void Input::Update() {
 	std::memcpy(preKey_, key_, 256);
 	//前のフレームのマウス入力を取得する
 	mousePre_ = mouse_;
+
 	//キーボード情報の取得開始
 	keyboardDevice_->Acquire();
 	//マウス情報の取得開始
 	mouseDevice_->Acquire();
+
 	//全キーの入力状態を取得する
 	keyboardDevice_->GetDeviceState(sizeof(key_), key_);
 	//マウスの入力状態を取得する
 	mouseDevice_->GetDeviceState(sizeof(DIMOUSESTATE), &mouse_);
 }
 
-bool Input::PushKey(uint8_t keyNum) {
+bool Input::IsPushKey(uint8_t keyNum) {
 	if (key_[keyNum] == 0x80) {
 		return 1;
 	}
 	return 0;
 }
 
-bool Input::ReleaseKey(uint8_t keyNum) {
+bool Input::IsReleaseKey(uint8_t keyNum) {
 	if (key_[keyNum] == 0x00) {
 		return 1;
 	}
 	return 0;
 }
 
-bool Input::PushKeyEnter(uint8_t keyNum){
+bool Input::IsPushKeyEnter(uint8_t keyNum){
 	if (key_[keyNum] == 0x80 && preKey_[keyNum] == 0x00) {
 		return 1;
 	}
 	return 0;
 }
 
-bool Input::PushKeyExit(uint8_t keyNum) {
+bool Input::IsPushKeyExit(uint8_t keyNum) {
 	if (key_[keyNum] == 0x00 && preKey_[keyNum] == 0x80) {
 		return 1;
 	}
@@ -118,4 +120,12 @@ bool Input::IsPressMouseExit(int32_t mouseNum) {
 
 int32_t Input::GetWheel() {
 	return mouse_.lZ;
+}
+
+bool Input::GetJoystickState(XINPUT_STATE& state) {
+	DWORD dwResult = XInputGetState(0, &state);
+	if (dwResult == ERROR_SUCCESS){
+		return true;
+	}
+	return false;
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/MathFunction.h"
+#include "MathFunction.h"
 #include <iostream>
 #include <fstream>
 #include <variant>

@@ -144,17 +144,14 @@
     <ClCompile Include="Engine\Externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Project\Scene\GameManager.cpp">
-      <Filter>ソース ファイル\Project\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Project\Scene\GameScene.cpp">
-      <Filter>ソース ファイル\Project\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Project\Scene\TitleScene.cpp">
-      <Filter>ソース ファイル\Project\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\2D\GlobalVariables\GlobalVariables.cpp">
       <Filter>ソース ファイル\Engine\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\Game\GameManager\GameManager.cpp">
+      <Filter>ソース ファイル\Project\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\Game\GameScene\GameScene.cpp">
+      <Filter>ソース ファイル\Project\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,20 +233,17 @@
     <ClInclude Include="Engine\Externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Project\Scene\TitleScene.h">
-      <Filter>ヘッダー ファイル\Project\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Project\Scene\IScene.h">
-      <Filter>ヘッダー ファイル\Project\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Project\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル\Project\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Project\Scene\GameManager.h">
-      <Filter>ヘッダー ファイル\Project\Game</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\2D\GlobalVariables\GlobalVariables.h">
       <Filter>ヘッダー ファイル\Engine\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Project\Game\GameManager\GameManager.h">
+      <Filter>ヘッダー ファイル\Project\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Project\Game\GameManager\IScene.h">
+      <Filter>ヘッダー ファイル\Project\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Project\Game\GameScene\GameScene.h">
+      <Filter>ヘッダー ファイル\Project\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

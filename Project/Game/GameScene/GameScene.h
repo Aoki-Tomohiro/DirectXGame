@@ -1,5 +1,5 @@
 #pragma once
-#include "IScene.h"
+#include "GameManager/IScene.h"
 #include "TextureManager/TextureManager.h"
 #include "Audio/Audio.h"
 #include "Input/Input.h"

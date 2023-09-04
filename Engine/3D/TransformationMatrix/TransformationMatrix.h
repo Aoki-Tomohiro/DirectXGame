@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXCommon/DirectXCommon.h"
-#include "Math/MathFunction.h"
+#include "MathFunction.h"
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 

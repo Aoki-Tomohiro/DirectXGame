@@ -102,7 +102,7 @@ void Audio::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(uint32_t audioHandle, bool roop) {
+void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag) {
 	HRESULT result;
 	//波形フォーマットを元にSourceViceの作成
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
@@ -114,7 +114,7 @@ void Audio::SoundPlayWave(uint32_t audioHandle, bool roop) {
 	buf.pAudioData = soundDatas_[audioHandle].pBuffer;
 	buf.AudioBytes = soundDatas_[audioHandle].bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
-	if (roop) {
+	if (roopFlag) {
 		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
 	}
 

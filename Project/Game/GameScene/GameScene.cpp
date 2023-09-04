@@ -44,6 +44,16 @@ void GameScene::Initialize(GameManager* gameManager) {
 };
 
 void GameScene::Update(GameManager* gameManager) {
+	XINPUT_STATE joyState{};
+	if (input_->GetJoystickState(joyState)) {
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+			isDebugCameraActive_ = true;
+		}
+		else if(joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) {
+			isDebugCameraActive_ = false;
+		}
+	}
+
 	//スプライト
 	sprite_->SetTranslation(translation_);
 	sprite_->SetScale(scale_);
@@ -57,7 +67,7 @@ void GameScene::Update(GameManager* gameManager) {
 	//デバッグカメラの更新
 	debugCamera_->Update();
 	//デバッグカメラの切り替え
-	if (input_->PushKeyEnter(DIK_1)) {
+	if (input_->IsPushKeyEnter(DIK_1)) {
 		if (isDebugCameraActive_ == false) {
 			isDebugCameraActive_ = true;
 		}

@@ -3,8 +3,10 @@
 #include <wrl.h>
 #define DIRECTINPUT_VERSION 0x0800//DirectInputのバージョン指定
 #include <dinput.h>
+#include <Xinput.h>
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
+#pragma comment(lib,"xinput.lib")
 
 class Input{
 public:
@@ -34,28 +36,28 @@ public:
 	/// </summary>
 	/// <param name="keyNum"></param>
 	/// <returns></returns>
-	bool PushKey(uint8_t keyNum);
+	bool IsPushKey(uint8_t keyNum);
 
 	/// <summary>
 	/// キーを離しているかを判定
 	/// </summary>
 	/// <param name="keyNum"></param>
 	/// <returns></returns>
-	bool ReleaseKey(uint8_t keyNum);
+	bool IsReleaseKey(uint8_t keyNum);
 
 	/// <summary>
 	/// キーを押した瞬間を判定
 	/// </summary>
 	/// <param name="keyNum"></param>
 	/// <returns></returns>
-	bool PushKeyEnter(uint8_t keyNum);
+	bool IsPushKeyEnter(uint8_t keyNum);
 
 	/// <summary>
 	/// キーを離した瞬間を判定
 	/// </summary>
 	/// <param name="keyNum"></param>
 	/// <returns></returns>
-	bool PushKeyExit(uint8_t keyNum);
+	bool IsPushKeyExit(uint8_t keyNum);
 
 	/// <summary>
 	/// マウスが押されているかを判定
@@ -91,6 +93,12 @@ public:
 	/// <returns></returns>
 	int32_t GetWheel();
 
+	/// <summary>
+	/// コントローラーの状態を取得
+	/// </summary>
+	/// <returns></returns>
+	bool GetJoystickState(XINPUT_STATE& state);
+
 private:
 	static Input* instance;
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
@@ -100,5 +108,6 @@ private:
 	BYTE preKey_[256] = {};
 	DIMOUSESTATE mouse_ = {};
 	DIMOUSESTATE mousePre_ = {};
+	XINPUT_STATE state_{};
 };
 

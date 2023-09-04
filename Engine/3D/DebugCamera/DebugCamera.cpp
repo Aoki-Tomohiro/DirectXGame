@@ -48,7 +48,7 @@ void DebugCamera::Update() {
 	}
 
 	//左右移動
-	if (input_->PushKey(DIK_D)) {
+	if (input_->IsPushKey(DIK_D)) {
 		//速さ
 		const float speed = -0.2f;
 		//カメラの移動ベクトル
@@ -56,7 +56,7 @@ void DebugCamera::Update() {
 		//移動ベクトル分だけ座標を加算する
 		offset_ = Add(offset_, move);
 	}
-	else if (input_->PushKey(DIK_A)) {
+	else if (input_->IsPushKey(DIK_A)) {
 		//速さ
 		const float speed = 0.2f;
 		//カメラの移動ベクトル
@@ -66,7 +66,7 @@ void DebugCamera::Update() {
 	}
 
 	//上下移動
-	if (input_->PushKey(DIK_W)) {
+	if (input_->IsPushKey(DIK_W)) {
 		//速さ
 		const float speed = -0.2f;
 		//カメラの移動ベクトル
@@ -74,7 +74,7 @@ void DebugCamera::Update() {
 		//移動ベクトル分だけ座標を加算する
 		offset_ = Add(offset_, move);
 	}
-	else if (input_->PushKey(DIK_S)) {
+	else if (input_->IsPushKey(DIK_S)) {
 		//速さ
 		const float speed = 0.2f;
 		//カメラの移動ベクトル
@@ -84,7 +84,7 @@ void DebugCamera::Update() {
 	}
 
 	//X軸回転
-	if (input_->PushKey(DIK_UP)) {
+	if (input_->IsPushKey(DIK_UP)) {
 		//速さ
 		const float speed = 0.02f;
 		//追加回転分の回転行列を生成
@@ -93,7 +93,7 @@ void DebugCamera::Update() {
 		//累積の回転行列を合成
 		matRot_ = Multiply(matRotDelta, matRot_);
 	}
-	else if (input_->PushKey(DIK_DOWN)) {
+	else if (input_->IsPushKey(DIK_DOWN)) {
 		//速さ
 		const float speed = -0.02f;
 		//追加回転分の回転行列を生成
@@ -104,7 +104,7 @@ void DebugCamera::Update() {
 	}
 	
 	//Y軸回転
-	if (input_->PushKey(DIK_LEFT)) {
+	if (input_->IsPushKey(DIK_LEFT)) {
 		//速さ
 		const float speed = 0.02f;
 		//追加回転分の回転行列を生成
@@ -113,7 +113,7 @@ void DebugCamera::Update() {
 		//累積の回転行列を合成
 		matRot_ = Multiply(matRotDelta, matRot_);
 	}
-	else if (input_->PushKey(DIK_RIGHT)) {
+	else if (input_->IsPushKey(DIK_RIGHT)) {
 		//速さ
 		const float speed = -0.02f;
 		//追加回転分の回転行列を生成
