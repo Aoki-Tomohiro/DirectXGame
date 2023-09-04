@@ -93,6 +93,12 @@ public:
 	/// <param name="soundData"></param>
 	void SoundPlayWave(uint32_t audioHandle, bool roopFlag);
 
+	/// <summary>
+	/// 音声停止
+	/// </summary>
+	/// <param name="audioHandle"></param>
+	void StopAudio(uint32_t audioHandle);
+
 private:
 	Audio() = default;
 	~Audio() = default;
@@ -103,5 +109,6 @@ private:
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_ = nullptr;
 	IXAudio2MasteringVoice* masterVoice_ = nullptr;
 	std::array<SoundData, kMaxSoundData> soundDatas_{};
+	std::array<IXAudio2SourceVoice*, kMaxSoundData> sourceVoices_{};
 	uint32_t audioHandle_ = -1;
 };

@@ -102,11 +102,31 @@ void Audio::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
+//void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag) {
+//	HRESULT result;
+//	//波形フォーマットを元にSourceViceの作成
+//	IXAudio2SourceVoice* pSourceVoice = nullptr;
+//	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundDatas_[audioHandle].wfex);
+//	assert(SUCCEEDED(result));
+//
+//	//再生する波形データの設定
+//	XAUDIO2_BUFFER buf{};
+//	buf.pAudioData = soundDatas_[audioHandle].pBuffer;
+//	buf.AudioBytes = soundDatas_[audioHandle].bufferSize;
+//	buf.Flags = XAUDIO2_END_OF_STREAM;
+//	if (roopFlag) {
+//		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+//	}
+//
+//	//波形データの再生
+//	result = pSourceVoice->SubmitSourceBuffer(&buf);
+//	result = pSourceVoice->Start();
+//}
+
 void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag) {
 	HRESULT result;
 	//波形フォーマットを元にSourceViceの作成
-	IXAudio2SourceVoice* pSourceVoice = nullptr;
-	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundDatas_[audioHandle].wfex);
+	result = xAudio2_->CreateSourceVoice(&sourceVoices_[audioHandle], &soundDatas_[audioHandle].wfex);
 	assert(SUCCEEDED(result));
 
 	//再生する波形データの設定
@@ -119,6 +139,11 @@ void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag) {
 	}
 
 	//波形データの再生
-	result = pSourceVoice->SubmitSourceBuffer(&buf);
-	result = pSourceVoice->Start();
+	result = sourceVoices_[audioHandle]->SubmitSourceBuffer(&buf);
+	result = sourceVoices_[audioHandle]->Start();
+}
+
+void Audio::StopAudio(uint32_t audioHandle) {
+	HRESULT result;
+	result = sourceVoices_[audioHandle]->Stop();
 }
