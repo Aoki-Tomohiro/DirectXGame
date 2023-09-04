@@ -25,6 +25,8 @@ GameManager::GameManager() {
 	//ポストプロセスの初期化
 	postProcess_ = PostProcess::GetInstance();
 	postProcess_->Initialize();
+	//グローバル変数の読み込み
+	GlobalVariables::GetInstance()->LoadFiles();
 	//シーンの初期化
 	currentScene_ = new GameScene();
 	currentScene_->Initialize(this);
