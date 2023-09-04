@@ -70,9 +70,11 @@ void GameScene::Update(GameManager* gameManager) {
 	if (input_->IsPushKeyEnter(DIK_1)) {
 		if (isDebugCameraActive_ == false) {
 			isDebugCameraActive_ = true;
+			audio_->SoundPlayWave(audioHandle_, false);
 		}
 		else {
 			isDebugCameraActive_ = false;
+			audio_->SoundPlayWave(audioHandle_, false);
 		}
 	}
 	//ビュープロジェクションの更新

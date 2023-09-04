@@ -16,6 +16,12 @@ void Audio::DeleteInstance() {
 }
 
 void Audio::Finalize() {
+	//ボイスデータ開放
+	for (int i = 0; i < sourceVoices_.size(); i++) {
+		if (sourceVoices_[i] != nullptr) {
+			sourceVoices_[i]->DestroyVoice();
+		}
+	}
 	//XAudio2解放
 	xAudio2_.Reset();
 	//音声データ開放
@@ -125,7 +131,8 @@ void Audio::SoundUnload(SoundData* soundData) {
 
 void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag) {
 	HRESULT result;
-	//波形フォーマットを元にSourceViceの作成
+	//波形フォーマットを元にSourceVoiceの作成
+	sourceVoices_[audioHandle] = nullptr;
 	result = xAudio2_->CreateSourceVoice(&sourceVoices_[audioHandle], &soundDatas_[audioHandle].wfex);
 	assert(SUCCEEDED(result));
 
