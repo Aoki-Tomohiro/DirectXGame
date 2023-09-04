@@ -19,6 +19,12 @@ void DebugCamera::Update() {
 		//座標をコピーしてオフセット分ずらす
 		worldTransform_.translation_ = Add(target_->translation_, offset);
 	}
+	//追従対象からカメラまでのオフセット(0度の時の値)
+	Vector3 offset = offset_;
+	//オフセットをカメラの回転に合わせて回転させる
+	offset = TransformNormal(offset, matRot_);
+	//座標をコピーしてオフセット分ずらす
+	worldTransform_.translation_ = offset;
 
 	//座標から平行移動行列を計算する
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(worldTransform_.translation_);
