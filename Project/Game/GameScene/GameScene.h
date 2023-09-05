@@ -40,8 +40,6 @@ public:
 	void Draw(GameManager* gameManager)override;
 
 private:
-	//DirectX
-	DirectXCommon* dxCommon_ = nullptr;
 	//TextureManager
 	TextureManager* textureManager_ = nullptr;
 	//Audio
@@ -50,31 +48,12 @@ private:
 	Input* input_ = nullptr;
 	//PostProcess
 	PostProcess* postProcess_ = nullptr;
+	//衝突マネージャー
+	CollisionManager* collisionManager_ = nullptr;
 	//DebugCamera
 	DebugCamera* debugCamera_ = nullptr;
 	//DebugCameraの切り替え
 	bool isDebugCameraActive_ = false;
-	//画像
-	uint32_t textureHandle_ = 0;
-	//音声データ
-	uint32_t audioHandle_ = 0;
-	uint32_t audioHandle2_ = 0;
-	//スプライトの調整項目
-	Sprite* sprite_ = nullptr;
-	Sprite* sprite2_ = nullptr;
-	Vector2 translation_{ 0.0f,0.0f };
-	Vector2 scale_{ 1.0f,1.0f };
-	float rotation_ = 0.0f;
-	Vector4 color_{ 1.0f,1.0f,1.0f,1.0f };
-	Vector2 uvTranslation_{ 0.0f,0.0f };
-	float uvRotation_ = 0.0f;
-	Vector2 uvScale_{ 1.0f,1.0f };
-	//モデル
-	Model* modelPlane_ = nullptr;
-	//モデルのワールドトランスフォーム
-	WorldTransform worldTransformPlane_{};
 	//ビュープロジェクション
 	ViewProjection viewProjection_{};
-	//衝突マネージャー
-	CollisionManager* collisionManager_ = nullptr;
 };
