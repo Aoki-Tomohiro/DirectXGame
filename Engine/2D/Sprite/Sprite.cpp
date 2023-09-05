@@ -77,7 +77,7 @@ IDxcBlob* Sprite::CompileShader(const std::wstring& filePath, const wchar_t* pro
 	return shaderBlob;
 }
 
-void Sprite::CreatePipelineStateObject() {
+void Sprite::CreatePipelineStateObject(BlendMode blendMode) {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -145,6 +145,38 @@ void Sprite::CreatePipelineStateObject() {
 	//すべての色要素を書き込む
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	switch (blendMode){
+	case kNone:
+		blendDesc.RenderTarget[0].BlendEnable = false;
+		break;
+	case kNormal:
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		break;
+	case kAdd:
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+	case kSubtract:
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+	}
 
 	//RasterizerStateの設定を行う
 	//裏面(時計回り)を表示しない
@@ -202,11 +234,11 @@ Sprite::Sprite() {};
 
 Sprite::~Sprite() {};
 
-void Sprite::Create(uint32_t textureHandle, Vector2 position) {
+void Sprite::Create(uint32_t textureHandle, Vector2 position, BlendMode blendMode) {
 	//DxcCompilerの初期化
 	Sprite::InitializeDxcCompiler();
 	//パイプラインステートの作成
-	Sprite::CreatePipelineStateObject();
+	Sprite::CreatePipelineStateObject(blendMode);
 	//コマンドリストを取得
 	commandList_ = DirectXCommon::GetInstance()->GetCommandList().Get();
 	//平行投影行列の作成

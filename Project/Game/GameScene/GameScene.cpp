@@ -33,9 +33,11 @@ void GameScene::Initialize(GameManager* gameManager) {
 	audioHandle2_ = audio_->SoundLoadWave("Project/Resources/Alarm02.wav");
 	//スプライトの作成
 	sprite_ = new Sprite();
-	sprite_->Create(textureHandle_, translation_);
+	sprite_->SetColor(Vector4{ 1.0f,1.0f,1.0f,0.5f });
+	sprite_->Create(textureHandle_, translation_, kNormal);
 	sprite2_ = new Sprite();
-	sprite2_->Create(textureHandle_, translation_);
+	sprite2_->SetColor(Vector4{ 1.0f,1.0f,1.0f,0.5f });
+	sprite2_->Create(textureHandle_, translation_, kNormal);
 	//モデルの作成
 	modelPlane_ = new Model();
 	modelPlane_->CreateFromOBJ("Project/Resources", "plane.obj");

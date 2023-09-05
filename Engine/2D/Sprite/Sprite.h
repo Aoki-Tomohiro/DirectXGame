@@ -5,6 +5,13 @@
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
+enum BlendMode {
+	kNone,
+	kNormal,
+	kAdd,
+	kSubtract,
+};
+
 class Sprite{
 public:
 	enum class RootParameterIndex {
@@ -42,7 +49,7 @@ public:
 	/// </summary>
 	/// <param name="textureHandle"></param>
 	/// <param name="position"></param>
-	void Create(uint32_t textureHandle, Vector2 position);
+	void Create(uint32_t textureHandle, Vector2 position, BlendMode blendMode);
 
 	/// <summary>
 	/// 描画
@@ -160,7 +167,7 @@ private:
 	/// <summary>
 	/// パイプラインステートの作成
 	/// </summary>
-	void CreatePipelineStateObject();
+	void CreatePipelineStateObject(BlendMode blendMode);
 
 	/// <summary>
 	/// マッピング
