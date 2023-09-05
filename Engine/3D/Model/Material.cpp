@@ -18,10 +18,10 @@ void Material::Create() {
 
 void Material::Update() {
 	//uvTransform
-	Transform uvTransform = { {scale_.x,scale_.y,1.0f},{0.0f,0.0f,rotation_},{translation_.x,translation_.y,0.0f} };
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
+	//Transform uvTransform = { {scale_.x,scale_.y,1.0f},{0.0f,0.0f,rotation_},{translation_.x,translation_.y,0.0f} };
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(Vector3{ scale_.x,scale_.y,1.0f });
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(rotation_));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(Vector3{ translation_.x,translation_.y,0.0f }));
 	//マテリアルリソースに書き込む
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;

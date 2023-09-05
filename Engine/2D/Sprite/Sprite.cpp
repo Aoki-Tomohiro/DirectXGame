@@ -145,7 +145,7 @@ void Sprite::CreatePipelineStateObject(BlendMode blendMode) {
 	//すべての色要素を書き込む
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	switch (blendMode){
+	switch (blendMode) {
 	case kNone:
 		blendDesc.RenderTarget[0].BlendEnable = false;
 		break;
@@ -282,10 +282,10 @@ void Sprite::Map() {
 	WVPResource_->Unmap(0, nullptr);
 
 	//マテリアル用のリソースにデータを書き込む
-	Transform uvTransform{ {uvScale_.x,uvScale_.y,1.0f},{0.0f,0.0f,uvRotation_},{uvTranslation_.x,uvTranslation_.y,0.0f} };
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform.translate));
+	//Transform uvTransform{ {uvScale_.x,uvScale_.y,1.0f},{0.0f,0.0f,uvRotation_},{uvTranslation_.x,uvTranslation_.y,0.0f} };
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(Vector3{ uvScale_.x,uvScale_.y,1.0f });
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvRotation_));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(Vector3{ uvTranslation_.x,uvTranslation_.y,0.0f }));
 	MaterialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = color_;
 	materialData_->uvTransform = uvTransformMatrix;
