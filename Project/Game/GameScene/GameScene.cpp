@@ -21,15 +21,6 @@ void GameScene::Initialize(GameManager* gameManager) {
 };
 
 void GameScene::Update(GameManager* gameManager) {
-	XINPUT_STATE joyState{};
-	if (input_->GetJoystickState(joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
-			isDebugCameraActive_ = true;
-		}
-		else if(joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) {
-			isDebugCameraActive_ = false;
-		}
-	}
 
 	//デバッグカメラの更新
 	debugCamera_->Update();
