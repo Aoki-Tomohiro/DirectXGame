@@ -61,6 +61,7 @@ private:
 	uint32_t audioHandle2_ = 0;
 	//スプライトの調整項目
 	Sprite* sprite_ = nullptr;
+	Sprite* sprite2_ = nullptr;
 	Vector2 translation_{ 0.0f,0.0f };
 	Vector2 scale_{ 1.0f,1.0f };
 	float rotation_ = 0.0f;

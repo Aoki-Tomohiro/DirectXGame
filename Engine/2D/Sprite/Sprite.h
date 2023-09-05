@@ -201,18 +201,18 @@ private:
 	//リソース設定
 	D3D12_RESOURCE_DESC resourceDesc_{};
 	//座標
-	Vector2 translation_{};
+	Vector2 translation_{ 0.0f,0.0f };
 	//角度
-	float rotation_{};
+	float rotation_ = 0.0f;
 	//スケール
-	Vector2 scale_{};
+	Vector2 scale_{ 1.0f,1.0f };
 	//色
 	Vector4 color_{ 1.0f,1.0f,1.0f,1.0f };
 	//uv座標
-	Vector2 uvTranslation_{};
+	Vector2 uvTranslation_{0.0f,0.0f};
 	//uv角度
-	float uvRotation_{};
+	float uvRotation_ = 0.0f;;
 	//uvスケール
-	Vector2 uvScale_{};
+	Vector2 uvScale_{ 1.0f,1.0f };
 };
 

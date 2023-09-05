@@ -7,6 +7,7 @@ GameScene::~GameScene() {
 	delete collisionManager_;
 	delete debugCamera_;
 	delete sprite_;
+	delete sprite2_;
 	delete modelPlane_;
 };
 
@@ -33,6 +34,8 @@ void GameScene::Initialize(GameManager* gameManager) {
 	//スプライトの作成
 	sprite_ = new Sprite();
 	sprite_->Create(textureHandle_, translation_);
+	sprite2_ = new Sprite();
+	sprite2_->Create(textureHandle_, translation_);
 	//モデルの作成
 	modelPlane_ = new Model();
 	modelPlane_->CreateFromOBJ("Project/Resources", "plane.obj");
@@ -125,6 +128,7 @@ void GameScene::Update(GameManager* gameManager) {
 void GameScene::Draw(GameManager* gameManager) {
 	//スプライトの描画
 	sprite_->Draw();
+	sprite2_->Draw();
 
 #pragma region ポストプロセス
 	//ポストプロセスの描画前処理
